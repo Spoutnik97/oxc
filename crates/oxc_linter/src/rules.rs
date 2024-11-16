@@ -28,6 +28,7 @@ mod import {
 
 mod eslint {
     pub mod array_callback_return;
+    pub mod no_duplicate_imports;
     pub mod constructor_super;
     pub mod default_case;
     pub mod default_case_last;
@@ -519,6 +520,7 @@ oxc_macros::declare_all_lint_rules! {
     eslint::max_classes_per_file,
     eslint::max_lines,
     eslint::max_params,
+    eslint::no_duplicate_imports,
     eslint::no_alert,
     eslint::no_array_constructor,
     eslint::no_async_promise_executor,
