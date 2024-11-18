@@ -28,7 +28,6 @@ mod import {
 
 mod eslint {
     pub mod array_callback_return;
-    pub mod no_duplicate_imports;
     pub mod constructor_super;
     pub mod default_case;
     pub mod default_case_last;
@@ -65,6 +64,7 @@ mod eslint {
     pub mod no_dupe_else_if;
     pub mod no_dupe_keys;
     pub mod no_duplicate_case;
+    pub mod no_duplicate_imports;
     pub mod no_else_return;
     pub mod no_empty;
     pub mod no_empty_character_class;
