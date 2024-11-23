@@ -1,6 +1,6 @@
 //! Declare symbol for `BindingIdentifier`s
 
-use std::{borrow::Cow, ptr};
+use std::ptr;
 
 use oxc_ast::{ast::*, AstKind};
 use oxc_ecmascript::{BoundNames, IsSimpleParameterList};
@@ -383,22 +383,9 @@ impl<'a> Binder<'a> for TSEnumDeclaration<'a> {
 
 impl<'a> Binder<'a> for TSEnumMember<'a> {
     fn bind(&self, builder: &mut SemanticBuilder) {
-        // TODO: Perf
-        if self.id.is_expression() {
-            return;
-        }
-        let name = match &self.id {
-            TSEnumMemberName::StaticIdentifier(id) => Cow::Borrowed(id.name.as_str()),
-            TSEnumMemberName::StaticStringLiteral(s) => Cow::Borrowed(s.value.as_str()),
-            TSEnumMemberName::StaticTemplateLiteral(s) => Cow::Borrowed(
-                s.quasi().expect("Template enum members must have no substitutions.").as_str(),
-            ),
-            TSEnumMemberName::StaticNumericLiteral(n) => Cow::Owned(n.value.to_string()),
-            match_expression!(TSEnumMemberName) => panic!("TODO: implement"),
-        };
         builder.declare_symbol(
             self.span,
-            &name,
+            self.id.static_name().as_str(),
             SymbolFlags::EnumMember,
             SymbolFlags::EnumMemberExcludes,
         );
@@ -408,7 +395,7 @@ impl<'a> Binder<'a> for TSEnumMember<'a> {
 impl<'a> Binder<'a> for TSModuleDeclaration<'a> {
     fn bind(&self, builder: &mut SemanticBuilder) {
         // do not bind `global` for `declare global { ... }`
-        if matches!(self.kind, TSModuleDeclarationKind::Global) {
+        if self.kind == TSModuleDeclarationKind::Global {
             return;
         }
 
@@ -422,11 +409,8 @@ impl<'a> Binder<'a> for TSModuleDeclaration<'a> {
             SymbolFlags::None,
         );
 
-        // do not bind `global` for `declare global { ... }`
-        if !self.kind.is_global() {
-            if let TSModuleDeclarationName::Identifier(id) = &self.id {
-                id.symbol_id.set(Some(symbol_id));
-            }
+        if let TSModuleDeclarationName::Identifier(id) = &self.id {
+            id.symbol_id.set(Some(symbol_id));
         }
     }
 }

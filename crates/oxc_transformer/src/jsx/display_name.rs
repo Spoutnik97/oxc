@@ -43,7 +43,7 @@
 //!
 //! ## References:
 //!
-//! * Babel plugin implementation: <https://github.com/babel/babel/blob/main/packages/babel-plugin-transform-react-display-name/src/index.ts>
+//! * Babel plugin implementation: <https://github.com/babel/babel/blob/v7.26.2/packages/babel-plugin-transform-react-display-name/src/index.ts>
 
 use oxc_ast::ast::*;
 use oxc_span::{Atom, SPAN};
@@ -174,7 +174,6 @@ impl<'a, 'ctx> ReactDisplayName<'a, 'ctx> {
                 PropertyKind::Init,
                 ctx.ast.property_key_identifier_name(SPAN, DISPLAY_NAME),
                 ctx.ast.expression_string_literal(SPAN, name),
-                None,
                 false,
                 false,
                 false,

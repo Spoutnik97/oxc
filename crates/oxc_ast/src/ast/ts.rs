@@ -1,6 +1,6 @@
 //! TypeScript Definitions
 //!
-//! - [AST Spec](https://github.com/typescript-eslint/typescript-eslint/tree/main/packages/ast-spec)
+//! - [AST Spec](https://github.com/typescript-eslint/typescript-eslint/tree/v8.9.0/packages/ast-spec)
 //! - [Archived TypeScript spec](https://github.com/microsoft/TypeScript/blob/3c99d50da5a579d9fa92d02664b1b66d4ff55944/doc/spec-ARCHIVED.md)
 #![allow(missing_docs)] // FIXME
 
@@ -16,7 +16,7 @@ use oxc_estree::ESTree;
 use oxc_span::{cmp::ContentEq, hash::ContentHash, Atom, GetSpan, GetSpanMut, Span};
 use oxc_syntax::scope::ScopeId;
 
-use super::{inherit_variants, js::*, jsx::*, literal::*};
+use super::{inherit_variants, js::*, literal::*};
 
 /// TypeScript `this` parameter
 ///
@@ -102,26 +102,13 @@ pub struct TSEnumMember<'a> {
     pub initializer: Option<Expression<'a>>,
 }
 
-inherit_variants! {
 /// TS Enum Member Name
-///
-/// Used in [`TSEnumMember`]. Inherits variants from [`Expression`]. See [`ast` module docs] for
-/// explanation of inheritance.
-///
-/// [`ast` module docs]: `super`
 #[ast(visit)]
 #[derive(Debug)]
 #[generate_derive(CloneIn, GetSpan, GetSpanMut, ContentEq, ContentHash, ESTree)]
 pub enum TSEnumMemberName<'a> {
-    StaticIdentifier(Box<'a, IdentifierName<'a>>) = 64,
-    StaticStringLiteral(Box<'a, StringLiteral<'a>>) = 65,
-    StaticTemplateLiteral(Box<'a, TemplateLiteral<'a>>) = 66,
-    // Invalid Grammar `enum E { 1 }`
-    StaticNumericLiteral(Box<'a, NumericLiteral<'a>>) = 67,
-    // Invalid Grammar `enum E { [computed] }`
-    // `Expression` variants added here by `inherit_variants!` macro
-    @inherit Expression
-}
+    Identifier(Box<'a, IdentifierName<'a>>) = 0,
+    String(Box<'a, StringLiteral<'a>>) = 1,
 }
 
 /// TypeScript Type Annotation

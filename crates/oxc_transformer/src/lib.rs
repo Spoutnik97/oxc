@@ -3,7 +3,7 @@
 //! References:
 //! * <https://www.typescriptlang.org/tsconfig#target>
 //! * <https://babel.dev/docs/presets>
-//! * <https://github.com/microsoft/TypeScript/blob/main/src/compiler/transformer.ts>
+//! * <https://github.com/microsoft/TypeScript/blob/v5.6.3/src/compiler/transformer.ts>
 
 use std::path::Path;
 
@@ -56,7 +56,7 @@ pub use crate::{
     jsx::{JsxOptions, JsxRuntime, ReactRefreshOptions},
     options::{
         babel::{BabelEnvOptions, BabelOptions},
-        ESTarget, Engine, EngineTargets, EnvOptions, TransformOptions,
+        ESTarget, Engine, EngineTargets, EnvOptions, Module, TransformOptions,
     },
     plugins::*,
     typescript::{RewriteExtensionsMode, TypeScriptOptions},
@@ -70,14 +70,24 @@ pub struct TransformerReturn {
 
 pub struct Transformer<'a> {
     ctx: TransformCtx<'a>,
-    options: TransformOptions,
+    // options: TransformOptions,
     allocator: &'a Allocator,
+
+    typescript: TypeScriptOptions,
+    jsx: JsxOptions,
+    env: EnvOptions,
 }
 
 impl<'a> Transformer<'a> {
-    pub fn new(allocator: &'a Allocator, source_path: &Path, options: TransformOptions) -> Self {
-        let ctx = TransformCtx::new(source_path, &options);
-        Self { ctx, options, allocator }
+    pub fn new(allocator: &'a Allocator, source_path: &Path, options: &TransformOptions) -> Self {
+        let ctx = TransformCtx::new(source_path, options);
+        Self {
+            ctx,
+            allocator,
+            typescript: options.typescript.clone(),
+            jsx: options.jsx.clone(),
+            env: options.env,
+        }
     }
 
     pub fn build_with_symbols_and_scopes(
@@ -91,24 +101,29 @@ impl<'a> Transformer<'a> {
 
         self.ctx.source_type = program.source_type;
         self.ctx.source_text = program.source_text;
-        jsx::update_options_with_comments(&program.comments, &mut self.options, &self.ctx);
+        jsx::update_options_with_comments(
+            &program.comments,
+            &mut self.typescript,
+            &mut self.jsx,
+            &self.ctx,
+        );
 
         let mut transformer = TransformerImpl {
-            common: Common::new(&self.options, &self.ctx),
+            common: Common::new(&self.env, &self.ctx),
             x0_typescript: program
                 .source_type
                 .is_typescript()
-                .then(|| TypeScript::new(&self.options.typescript, &self.ctx)),
-            x1_jsx: Jsx::new(self.options.jsx, ast_builder, &self.ctx),
-            x2_es2022: ES2022::new(self.options.env.es2022, &self.ctx),
-            x2_es2021: ES2021::new(self.options.env.es2021, &self.ctx),
-            x2_es2020: ES2020::new(self.options.env.es2020, &self.ctx),
-            x2_es2019: ES2019::new(self.options.env.es2019),
-            x2_es2018: ES2018::new(self.options.env.es2018, &self.ctx),
-            x2_es2016: ES2016::new(self.options.env.es2016, &self.ctx),
-            x2_es2017: ES2017::new(self.options.env.es2017, &self.ctx),
-            x3_es2015: ES2015::new(self.options.env.es2015, &self.ctx),
-            x4_regexp: RegExp::new(self.options.env.regexp, &self.ctx),
+                .then(|| TypeScript::new(&self.typescript, &self.ctx)),
+            x1_jsx: Jsx::new(self.jsx, self.env.es2018.object_rest_spread, ast_builder, &self.ctx),
+            x2_es2022: ES2022::new(self.env.es2022, &self.ctx),
+            x2_es2021: ES2021::new(self.env.es2021, &self.ctx),
+            x2_es2020: ES2020::new(self.env.es2020, &self.ctx),
+            x2_es2019: ES2019::new(self.env.es2019),
+            x2_es2018: ES2018::new(self.env.es2018, &self.ctx),
+            x2_es2016: ES2016::new(self.env.es2016, &self.ctx),
+            x2_es2017: ES2017::new(self.env.es2017, &self.ctx),
+            x3_es2015: ES2015::new(self.env.es2015, &self.ctx),
+            x4_regexp: RegExp::new(self.env.regexp, &self.ctx),
         };
 
         let (symbols, scopes) = traverse_mut(&mut transformer, allocator, program, symbols, scopes);
@@ -146,19 +161,29 @@ impl<'a, 'ctx> Traverse<'a> for TransformerImpl<'a, 'ctx> {
         if let Some(typescript) = self.x0_typescript.as_mut() {
             typescript.exit_program(program, ctx);
         }
+        self.x2_es2018.exit_program(program, ctx);
         self.common.exit_program(program, ctx);
     }
 
     // ALPHASORT
-
     fn enter_arrow_function_expression(
         &mut self,
         arrow: &mut ArrowFunctionExpression<'a>,
         ctx: &mut TraverseCtx<'a>,
     ) {
+        self.common.enter_arrow_function_expression(arrow, ctx);
         if let Some(typescript) = self.x0_typescript.as_mut() {
             typescript.enter_arrow_function_expression(arrow, ctx);
         }
+        self.x2_es2018.enter_arrow_function_expression(arrow, ctx);
+    }
+
+    fn enter_variable_declaration(
+        &mut self,
+        decl: &mut VariableDeclaration<'a>,
+        ctx: &mut TraverseCtx<'a>,
+    ) {
+        self.x2_es2018.enter_variable_declaration(decl, ctx);
     }
 
     fn enter_variable_declarator(
@@ -175,6 +200,22 @@ impl<'a, 'ctx> Traverse<'a> for TransformerImpl<'a, 'ctx> {
         self.x2_es2020.enter_big_int_literal(node, ctx);
     }
 
+    fn enter_binding_identifier(
+        &mut self,
+        node: &mut BindingIdentifier<'a>,
+        ctx: &mut TraverseCtx<'a>,
+    ) {
+        self.common.enter_binding_identifier(node, ctx);
+    }
+
+    fn enter_identifier_reference(
+        &mut self,
+        node: &mut IdentifierReference<'a>,
+        ctx: &mut TraverseCtx<'a>,
+    ) {
+        self.common.enter_identifier_reference(node, ctx);
+    }
+
     fn enter_binding_pattern(&mut self, pat: &mut BindingPattern<'a>, ctx: &mut TraverseCtx<'a>) {
         if let Some(typescript) = self.x0_typescript.as_mut() {
             typescript.enter_binding_pattern(pat, ctx);
@@ -186,6 +227,12 @@ impl<'a, 'ctx> Traverse<'a> for TransformerImpl<'a, 'ctx> {
             typescript.enter_call_expression(expr, ctx);
         }
         self.x1_jsx.enter_call_expression(expr, ctx);
+    }
+
+    fn enter_chain_element(&mut self, element: &mut ChainElement<'a>, ctx: &mut TraverseCtx<'a>) {
+        if let Some(typescript) = self.x0_typescript.as_mut() {
+            typescript.enter_chain_element(element, ctx);
+        }
     }
 
     fn enter_class(&mut self, class: &mut Class<'a>, ctx: &mut TraverseCtx<'a>) {
@@ -259,6 +306,22 @@ impl<'a, 'ctx> Traverse<'a> for TransformerImpl<'a, 'ctx> {
         }
     }
 
+    fn enter_formal_parameters(
+        &mut self,
+        node: &mut FormalParameters<'a>,
+        ctx: &mut TraverseCtx<'a>,
+    ) {
+        self.x2_es2020.enter_formal_parameters(node, ctx);
+    }
+
+    fn exit_formal_parameters(
+        &mut self,
+        node: &mut FormalParameters<'a>,
+        ctx: &mut TraverseCtx<'a>,
+    ) {
+        self.x2_es2020.exit_formal_parameters(node, ctx);
+    }
+
     fn enter_formal_parameter(
         &mut self,
         param: &mut FormalParameter<'a>,
@@ -271,6 +334,7 @@ impl<'a, 'ctx> Traverse<'a> for TransformerImpl<'a, 'ctx> {
 
     fn enter_function(&mut self, func: &mut Function<'a>, ctx: &mut TraverseCtx<'a>) {
         self.common.enter_function(func, ctx);
+        self.x2_es2018.enter_function(func, ctx);
     }
 
     fn exit_function(&mut self, func: &mut Function<'a>, ctx: &mut TraverseCtx<'a>) {
@@ -281,6 +345,14 @@ impl<'a, 'ctx> Traverse<'a> for TransformerImpl<'a, 'ctx> {
         self.x2_es2018.exit_function(func, ctx);
         self.x2_es2017.exit_function(func, ctx);
         self.common.exit_function(func, ctx);
+    }
+
+    fn enter_function_body(&mut self, body: &mut FunctionBody<'a>, ctx: &mut TraverseCtx<'a>) {
+        self.common.enter_function_body(body, ctx);
+    }
+
+    fn exit_function_body(&mut self, body: &mut FunctionBody<'a>, ctx: &mut TraverseCtx<'a>) {
+        self.common.exit_function_body(body, ctx);
     }
 
     fn enter_jsx_element(&mut self, node: &mut JSXElement<'a>, ctx: &mut TraverseCtx<'a>) {
@@ -480,10 +552,12 @@ impl<'a, 'ctx> Traverse<'a> for TransformerImpl<'a, 'ctx> {
         if let Some(typescript) = self.x0_typescript.as_mut() {
             typescript.enter_for_in_statement(stmt, ctx);
         }
+        self.x2_es2018.enter_for_in_statement(stmt, ctx);
     }
 
     fn enter_catch_clause(&mut self, clause: &mut CatchClause<'a>, ctx: &mut TraverseCtx<'a>) {
         self.x2_es2019.enter_catch_clause(clause, ctx);
+        self.x2_es2018.enter_catch_clause(clause, ctx);
     }
 
     fn enter_import_declaration(

@@ -23,6 +23,12 @@ impl ContentHash for BooleanLiteral {
     }
 }
 
+impl<'a> ContentHash for StringLiteral<'a> {
+    fn content_hash<H: Hasher>(&self, state: &mut H) {
+        ContentHash::content_hash(&self.value, state);
+    }
+}
+
 impl<'a> ContentHash for BigIntLiteral<'a> {
     fn content_hash<H: Hasher>(&self, state: &mut H) {
         ContentHash::content_hash(&self.raw, state);
@@ -52,12 +58,6 @@ impl<'a> ContentHash for RegExpPattern<'a> {
             Self::Invalid(it) => ContentHash::content_hash(it, state),
             Self::Pattern(it) => ContentHash::content_hash(it, state),
         }
-    }
-}
-
-impl<'a> ContentHash for StringLiteral<'a> {
-    fn content_hash<H: Hasher>(&self, state: &mut H) {
-        ContentHash::content_hash(&self.value, state);
     }
 }
 
@@ -233,7 +233,6 @@ impl<'a> ContentHash for ObjectProperty<'a> {
         ContentHash::content_hash(&self.kind, state);
         ContentHash::content_hash(&self.key, state);
         ContentHash::content_hash(&self.value, state);
-        ContentHash::content_hash(&self.init, state);
         ContentHash::content_hash(&self.method, state);
         ContentHash::content_hash(&self.shorthand, state);
         ContentHash::content_hash(&self.computed, state);
@@ -642,6 +641,7 @@ impl<'a> ContentHash for ChainElement<'a> {
         ContentHash::content_hash(&discriminant(self), state);
         match self {
             Self::CallExpression(it) => ContentHash::content_hash(it, state),
+            Self::TSNonNullExpression(it) => ContentHash::content_hash(it, state),
             Self::ComputedMemberExpression(it) => ContentHash::content_hash(it, state),
             Self::StaticMemberExpression(it) => ContentHash::content_hash(it, state),
             Self::PrivateFieldExpression(it) => ContentHash::content_hash(it, state),
@@ -1417,52 +1417,8 @@ impl<'a> ContentHash for TSEnumMemberName<'a> {
     fn content_hash<H: Hasher>(&self, state: &mut H) {
         ContentHash::content_hash(&discriminant(self), state);
         match self {
-            Self::StaticIdentifier(it) => ContentHash::content_hash(it, state),
-            Self::StaticStringLiteral(it) => ContentHash::content_hash(it, state),
-            Self::StaticTemplateLiteral(it) => ContentHash::content_hash(it, state),
-            Self::StaticNumericLiteral(it) => ContentHash::content_hash(it, state),
-            Self::BooleanLiteral(it) => ContentHash::content_hash(it, state),
-            Self::NullLiteral(it) => ContentHash::content_hash(it, state),
-            Self::NumericLiteral(it) => ContentHash::content_hash(it, state),
-            Self::BigIntLiteral(it) => ContentHash::content_hash(it, state),
-            Self::RegExpLiteral(it) => ContentHash::content_hash(it, state),
-            Self::StringLiteral(it) => ContentHash::content_hash(it, state),
-            Self::TemplateLiteral(it) => ContentHash::content_hash(it, state),
             Self::Identifier(it) => ContentHash::content_hash(it, state),
-            Self::MetaProperty(it) => ContentHash::content_hash(it, state),
-            Self::Super(it) => ContentHash::content_hash(it, state),
-            Self::ArrayExpression(it) => ContentHash::content_hash(it, state),
-            Self::ArrowFunctionExpression(it) => ContentHash::content_hash(it, state),
-            Self::AssignmentExpression(it) => ContentHash::content_hash(it, state),
-            Self::AwaitExpression(it) => ContentHash::content_hash(it, state),
-            Self::BinaryExpression(it) => ContentHash::content_hash(it, state),
-            Self::CallExpression(it) => ContentHash::content_hash(it, state),
-            Self::ChainExpression(it) => ContentHash::content_hash(it, state),
-            Self::ClassExpression(it) => ContentHash::content_hash(it, state),
-            Self::ConditionalExpression(it) => ContentHash::content_hash(it, state),
-            Self::FunctionExpression(it) => ContentHash::content_hash(it, state),
-            Self::ImportExpression(it) => ContentHash::content_hash(it, state),
-            Self::LogicalExpression(it) => ContentHash::content_hash(it, state),
-            Self::NewExpression(it) => ContentHash::content_hash(it, state),
-            Self::ObjectExpression(it) => ContentHash::content_hash(it, state),
-            Self::ParenthesizedExpression(it) => ContentHash::content_hash(it, state),
-            Self::SequenceExpression(it) => ContentHash::content_hash(it, state),
-            Self::TaggedTemplateExpression(it) => ContentHash::content_hash(it, state),
-            Self::ThisExpression(it) => ContentHash::content_hash(it, state),
-            Self::UnaryExpression(it) => ContentHash::content_hash(it, state),
-            Self::UpdateExpression(it) => ContentHash::content_hash(it, state),
-            Self::YieldExpression(it) => ContentHash::content_hash(it, state),
-            Self::PrivateInExpression(it) => ContentHash::content_hash(it, state),
-            Self::JSXElement(it) => ContentHash::content_hash(it, state),
-            Self::JSXFragment(it) => ContentHash::content_hash(it, state),
-            Self::TSAsExpression(it) => ContentHash::content_hash(it, state),
-            Self::TSSatisfiesExpression(it) => ContentHash::content_hash(it, state),
-            Self::TSTypeAssertion(it) => ContentHash::content_hash(it, state),
-            Self::TSNonNullExpression(it) => ContentHash::content_hash(it, state),
-            Self::TSInstantiationExpression(it) => ContentHash::content_hash(it, state),
-            Self::ComputedMemberExpression(it) => ContentHash::content_hash(it, state),
-            Self::StaticMemberExpression(it) => ContentHash::content_hash(it, state),
-            Self::PrivateFieldExpression(it) => ContentHash::content_hash(it, state),
+            Self::String(it) => ContentHash::content_hash(it, state),
         }
     }
 }

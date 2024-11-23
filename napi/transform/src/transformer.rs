@@ -84,8 +84,11 @@ impl Compiler {
             .transpose()?
             .map(InjectGlobalVariablesConfig::new);
 
-        let transform_options =
-            options.map(oxc::transformer::TransformOptions::from).unwrap_or_default();
+        let transform_options = match options {
+            Some(options) => oxc::transformer::TransformOptions::try_from(options)
+                .map_err(|err| vec![OxcDiagnostic::error(err)])?,
+            None => oxc::transformer::TransformOptions::default(),
+        };
 
         Ok(Self {
             transform_options,
@@ -111,8 +114,8 @@ impl CompilerInterface for Compiler {
         self.sourcemap
     }
 
-    fn transform_options(&self) -> Option<oxc::transformer::TransformOptions> {
-        Some(self.transform_options.clone())
+    fn transform_options(&self) -> Option<&oxc::transformer::TransformOptions> {
+        Some(&self.transform_options)
     }
 
     fn isolated_declaration_options(&self) -> Option<IsolatedDeclarationsOptions> {

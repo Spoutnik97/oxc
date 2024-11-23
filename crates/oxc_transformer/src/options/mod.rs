@@ -1,14 +1,14 @@
 pub mod babel;
 
 mod browserslist_query;
+mod engine;
 mod engine_targets;
 mod env;
 mod es_features;
 mod es_target;
+mod module;
 
 use std::path::PathBuf;
-
-use oxc_diagnostics::Error;
 
 use crate::{
     common::helper_loader::{HelperLoaderMode, HelperLoaderOptions},
@@ -28,11 +28,8 @@ use crate::{
 };
 
 pub use self::{
-    browserslist_query::BrowserslistQuery,
-    engine_targets::{Engine, EngineTargets},
-    env::EnvOptions,
-    es_features::ESFeature,
-    es_target::ESTarget,
+    browserslist_query::BrowserslistQuery, engine::Engine, engine_targets::EngineTargets,
+    env::EnvOptions, es_features::ESFeature, es_target::ESTarget, module::Module,
 };
 
 use self::babel::BabelOptions;
@@ -88,22 +85,55 @@ impl TransformOptions {
             },
         }
     }
+
+    /// Initialize from a comma separated list of `target`s and `environmens`s.
+    ///
+    /// e.g. `es2022,chrome58,edge16`.
+    ///
+    /// # Errors
+    ///
+    /// * Same targets specified multiple times.
+    /// * No matching target.
+    /// * Invalid version.
+    pub fn from_target(s: &str) -> Result<Self, String> {
+        EnvOptions::from_target(s).map(|env| Self { env, ..Self::default() })
+    }
+
+    /// Initialize from a list of `target`s and `environmens`s.
+    ///
+    /// e.g. `["es2020", "chrome58", "edge16", "firefox57", "node12", "safari11"]`.
+    ///
+    /// `target`: `es5`, `es2015` ... `es2024`, `esnext`.
+    /// `environment`: `chrome`, `deno`, `edge`, `firefox`, `hermes`, `ie`, `ios`, `node`, `opera`, `rhino`, `safari`
+    ///
+    /// <https://esbuild.github.io/api/#target>
+    ///
+    /// # Errors
+    ///
+    /// * Same targets specified multiple times.
+    /// * No matching target.
+    /// * Invalid version.
+    pub fn from_target_list<S: AsRef<str>>(list: &[S]) -> Result<Self, String> {
+        EnvOptions::from_target_list(list).map(|env| Self { env, ..Self::default() })
+    }
 }
 
 impl From<ESTarget> for TransformOptions {
     fn from(target: ESTarget) -> Self {
-        Self { env: EnvOptions::from(target), ..Self::default() }
+        let mut engine_targets = EngineTargets::default();
+        engine_targets.insert(Engine::Es, target.version());
+        Self { env: EnvOptions::from(engine_targets), ..Self::default() }
     }
 }
 
 impl TryFrom<&BabelOptions> for TransformOptions {
-    type Error = Vec<Error>;
+    type Error = Vec<String>;
 
     /// If the `options` contains any unknown fields, they will be returned as a list of errors.
     fn try_from(options: &BabelOptions) -> Result<Self, Self::Error> {
-        let mut errors = Vec::<Error>::new();
-        errors.extend(options.plugins.errors.iter().map(|err| Error::msg(err.clone())));
-        errors.extend(options.presets.errors.iter().map(|err| Error::msg(err.clone())));
+        let mut errors = Vec::<String>::new();
+        errors.extend(options.plugins.errors.iter().map(Clone::clone));
+        errors.extend(options.presets.errors.iter().map(Clone::clone));
 
         let typescript = options
             .presets
@@ -130,7 +160,11 @@ impl TryFrom<&BabelOptions> for TransformOptions {
             jsx_options
         };
 
-        let env = options.presets.env.clone().unwrap_or_default();
+        let env = options.presets.env.unwrap_or_default();
+
+        let module = Module::try_from(&options.plugins).unwrap_or_else(|_| {
+            options.presets.env.as_ref().map(|env| env.module).unwrap_or_default()
+        });
 
         let regexp = RegExpOptions {
             sticky_flag: env.regexp.sticky_flag || options.plugins.sticky_flag,
@@ -174,6 +208,7 @@ impl TryFrom<&BabelOptions> for TransformOptions {
         };
 
         let es2020 = ES2020Options {
+            optional_chaining: options.plugins.optional_chaining || env.es2020.optional_chaining,
             nullish_coalescing_operator: options.plugins.nullish_coalescing_operator
                 || env.es2020.nullish_coalescing_operator,
             big_int: env.es2020.big_int,
@@ -208,6 +243,7 @@ impl TryFrom<&BabelOptions> for TransformOptions {
             typescript,
             jsx,
             env: EnvOptions {
+                module,
                 regexp,
                 es2015,
                 es2016,

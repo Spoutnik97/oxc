@@ -7,18 +7,16 @@ import { MessageType, ShowMessageNotification } from 'vscode-languageclient';
 import { Executable, LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient/node';
 
 import { join } from 'node:path';
-import { ConfigService } from './config';
+import { ConfigService } from './ConfigService';
 
 const languageClientName = 'oxc';
 const outputChannelName = 'Oxc';
-const traceOutputChannelName = 'Oxc (Trace)';
 const commandPrefix = 'oxc';
 
 const enum OxcCommands {
   RestartServer = `${commandPrefix}.restartServer`,
   ApplyAllFixes = `${commandPrefix}.applyAllFixes`,
   ShowOutputChannel = `${commandPrefix}.showOutputChannel`,
-  ShowTraceOutputChannel = `${commandPrefix}.showTraceOutputChannel`,
   ToggleEnable = `${commandPrefix}.toggleEnable`,
 }
 
@@ -27,7 +25,7 @@ let client: LanguageClient;
 let myStatusBarItem: StatusBarItem;
 
 export async function activate(context: ExtensionContext) {
-  const config = new ConfigService();
+  const configService = new ConfigService();
   const restartCommand = commands.registerCommand(
     OxcCommands.RestartServer,
     async () => {
@@ -57,33 +55,24 @@ export async function activate(context: ExtensionContext) {
     },
   );
 
-  const showTraceOutputCommand = commands.registerCommand(
-    OxcCommands.ShowTraceOutputChannel,
-    () => {
-      client?.traceOutputChannel?.show();
-    },
-  );
-
   const toggleEnable = commands.registerCommand(
     OxcCommands.ToggleEnable,
     () => {
-      config.enable = !config.enable;
+      configService.config.updateEnable(!configService.config.enable);
     },
   );
 
   context.subscriptions.push(
     restartCommand,
     showOutputCommand,
-    showTraceOutputCommand,
     toggleEnable,
-    config,
+    configService,
   );
 
-  const outputChannel = window.createOutputChannel(outputChannelName);
-  const traceOutputChannel = window.createOutputChannel(traceOutputChannelName);
+  const outputChannel = window.createOutputChannel(outputChannelName, { log: true });
 
   async function findBinary(): Promise<string> {
-    let bin = config.binPath;
+    let bin = configService.config.binPath;
     if (bin) {
       try {
         await fsPromises.access(bin);
@@ -159,10 +148,10 @@ export async function activate(context: ExtensionContext) {
       ],
     },
     initializationOptions: {
-      settings: config.toLanguageServerConfig(),
+      settings: configService.config.toLanguageServerConfig(),
     },
     outputChannel,
-    traceOutputChannel,
+    traceOutputChannel: outputChannel,
   };
 
   // Create the language client and start the client.
@@ -173,9 +162,11 @@ export async function activate(context: ExtensionContext) {
   );
   client.onNotification(ShowMessageNotification.type, (params) => {
     switch (params.type) {
-      case MessageType.Log:
       case MessageType.Debug:
-        outputChannel.appendLine(params.message);
+        outputChannel.debug(params.message);
+        break;
+      case MessageType.Log:
+        outputChannel.info(params.message);
         break;
       case MessageType.Info:
         window.showInformationMessage(params.message);
@@ -187,7 +178,7 @@ export async function activate(context: ExtensionContext) {
         window.showErrorMessage(params.message);
         break;
       default:
-        outputChannel.appendLine(params.message);
+        outputChannel.info(params.message);
     }
   });
 
@@ -197,8 +188,8 @@ export async function activate(context: ExtensionContext) {
     });
   });
 
-  config.onConfigChange = function onConfigChange() {
-    let settings = this.toLanguageServerConfig();
+  configService.onConfigChange = function onConfigChange() {
+    let settings = this.config.toLanguageServerConfig();
     updateStatsBar(settings.enable);
     client.sendNotification('workspace/didChangeConfiguration', { settings });
   };
@@ -222,7 +213,7 @@ export async function activate(context: ExtensionContext) {
 
     myStatusBarItem.backgroundColor = bgColor;
   }
-  updateStatsBar(config.enable);
+  updateStatsBar(configService.config.enable);
   client.start();
 }
 

@@ -1,6 +1,6 @@
 use oxc_ast::{ast::BindingIdentifier, AstKind};
 use oxc_ecmascript::ToBoolean;
-use oxc_semantic::{AstNode, IsGlobalReference, NodeId, Semantic, SymbolId};
+use oxc_semantic::{AstNode, IsGlobalReference, NodeId, ReferenceId, Semantic, SymbolId};
 use oxc_span::{GetSpan, Span};
 use oxc_syntax::operator::{AssignmentOperator, BinaryOperator, LogicalOperator, UnaryOperator};
 
@@ -236,7 +236,7 @@ pub fn outermost_paren_parent<'a, 'b>(
 ) -> Option<&'b AstNode<'a>> {
     semantic
         .nodes()
-        .iter_parents(node.id())
+        .ancestors(node.id())
         .skip(1)
         .find(|parent| !matches!(parent.kind(), AstKind::ParenthesizedExpression(_)))
 }
@@ -248,7 +248,7 @@ pub fn nth_outermost_paren_parent<'a, 'b>(
 ) -> Option<&'b AstNode<'a>> {
     semantic
         .nodes()
-        .iter_parents(node.id())
+        .ancestors(node.id())
         .skip(1)
         .filter(|parent| !matches!(parent.kind(), AstKind::ParenthesizedExpression(_)))
         .nth(n)
@@ -259,10 +259,10 @@ pub fn nth_outermost_paren_parent<'a, 'b>(
 pub fn iter_outer_expressions<'a, 's>(
     semantic: &'s Semantic<'a>,
     node_id: NodeId,
-) -> impl Iterator<Item = &'s AstNode<'a>> + 's {
-    semantic.nodes().iter_parents(node_id).skip(1).filter(|parent| {
+) -> impl Iterator<Item = AstKind<'a>> + 's {
+    semantic.nodes().ancestor_kinds(node_id).skip(1).filter(|parent| {
         !matches!(
-            parent.kind(),
+            parent,
             AstKind::ParenthesizedExpression(_)
                 | AstKind::TSAsExpression(_)
                 | AstKind::TSSatisfiesExpression(_)
@@ -282,14 +282,20 @@ pub fn get_declaration_of_variable<'a, 'b>(
     Some(semantic.nodes().get_node(symbol_table.get_declaration(symbol_id)))
 }
 
+pub fn get_declaration_from_reference_id<'a, 'b>(
+    reference_id: ReferenceId,
+    semantic: &'b Semantic<'a>,
+) -> Option<&'b AstNode<'a>> {
+    let symbol_table = semantic.symbols();
+    let symbol_id = symbol_table.get_reference(reference_id).symbol_id()?;
+    Some(semantic.nodes().get_node(symbol_table.get_declaration(symbol_id)))
+}
+
 pub fn get_symbol_id_of_variable(
     ident: &IdentifierReference,
     semantic: &Semantic<'_>,
 ) -> Option<SymbolId> {
-    let symbol_table = semantic.symbols();
-    let reference_id = ident.reference_id.get()?;
-    let reference = symbol_table.get_reference(reference_id);
-    reference.symbol_id()
+    semantic.symbols().get_reference(ident.reference_id()).symbol_id()
 }
 
 pub fn extract_regex_flags<'a>(
@@ -335,9 +341,9 @@ pub fn is_method_call<'a>(
     let callee_without_parentheses = call_expr.callee.without_parentheses();
     let member_expr = match callee_without_parentheses {
         match_member_expression!(Expression) => callee_without_parentheses.to_member_expression(),
-        Expression::ChainExpression(chain) => match chain.expression {
-            match_member_expression!(ChainElement) => chain.expression.to_member_expression(),
-            ChainElement::CallExpression(_) => return false,
+        Expression::ChainExpression(chain) => match chain.expression.member_expression() {
+            Some(e) => e,
+            None => return false,
         },
         _ => return false,
     };

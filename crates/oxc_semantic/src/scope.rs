@@ -289,6 +289,21 @@ impl ScopeTree {
         &self.child_ids[scope_id]
     }
 
+    pub fn iter_all_child_ids(&self, scope_id: ScopeId) -> impl Iterator<Item = ScopeId> + '_ {
+        let mut stack = self.child_ids[scope_id].clone();
+        let child_ids: &IndexVec<ScopeId, Vec<ScopeId>> = &self.child_ids;
+        std::iter::from_fn(move || {
+            if let Some(scope_id) = stack.pop() {
+                if let Some(children) = child_ids.get(scope_id) {
+                    stack.extend(children.iter().copied());
+                }
+                Some(scope_id)
+            } else {
+                None
+            }
+        })
+    }
+
     /// Get a mutable reference to a scope's children
     #[inline]
     pub fn get_child_ids_mut(&mut self, scope_id: ScopeId) -> &mut Vec<ScopeId> {
@@ -333,6 +348,13 @@ impl ScopeTree {
         let from_map = &mut self.bindings[from];
         if let Some((name, symbol_id)) = from_map.swap_remove_entry(name) {
             self.bindings[to].insert(name, symbol_id);
+        }
+    }
+
+    /// Rename a binding to a new name.
+    pub fn rename_binding(&mut self, scope_id: ScopeId, old_name: &str, new_name: CompactStr) {
+        if let Some(symbol_id) = self.bindings[scope_id].shift_remove(old_name) {
+            self.bindings[scope_id].insert(new_name, symbol_id);
         }
     }
 

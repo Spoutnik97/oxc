@@ -14,11 +14,11 @@ use crate::{node_util::Ctx, CompressorPass};
 /// A peephole optimization that minimizes code by simplifying conditional
 /// expressions, replacing IFs with HOOKs, replacing object constructors
 /// with literals, and simplifying returns.
-/// <https://github.com/google/closure-compiler/blob/master/src/com/google/javascript/jscomp/PeepholeSubstituteAlternateSyntax.java>
+/// <https://github.com/google/closure-compiler/blob/v20240609/src/com/google/javascript/jscomp/PeepholeSubstituteAlternateSyntax.java>
 pub struct PeepholeSubstituteAlternateSyntax {
     /// Do not compress syntaxes that are hard to analyze inside the fixed loop.
     /// e.g. Do not compress `undefined -> void 0`, `true` -> `!0`.
-    /// Opposite of `late` in Closure Compier.
+    /// Opposite of `late` in Closure Compiler.
     in_fixed_loop: bool,
 
     // states
@@ -103,14 +103,11 @@ impl<'a> Traverse<'a> for PeepholeSubstituteAlternateSyntax {
                 }
             }
             Expression::CallExpression(call_expr) => {
-                if let Some(call_expr) =
+                if let Some(new_expr) =
                     Self::try_fold_literal_constructor_call_expression(call_expr, ctx)
+                        .or_else(|| Self::try_fold_simple_function_call(call_expr, ctx))
                 {
-                    *expr = call_expr;
-                    self.changed = true;
-                } else if let Some(call_expr) = Self::try_fold_simple_function_call(call_expr, ctx)
-                {
-                    *expr = call_expr;
+                    *expr = new_expr;
                     self.changed = true;
                 }
             }
@@ -569,7 +566,7 @@ impl<'a, 'b> PeepholeSubstituteAlternateSyntax {
     }
 }
 
-/// Port from <https://github.com/google/closure-compiler/blob/master/test/com/google/javascript/jscomp/PeepholeSubstituteAlternateSyntaxTest.java>
+/// Port from <https://github.com/google/closure-compiler/blob/v20240609/test/com/google/javascript/jscomp/PeepholeSubstituteAlternateSyntaxTest.java>
 #[cfg(test)]
 mod test {
     use oxc_allocator::Allocator;

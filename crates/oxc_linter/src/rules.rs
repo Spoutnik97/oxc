@@ -11,6 +11,8 @@ mod import {
     // pub mod no_unused_modules;
     pub mod default;
     pub mod export;
+    pub mod first;
+    pub mod import_no_namespace;
     pub mod max_dependencies;
     pub mod named;
     pub mod namespace;
@@ -24,6 +26,7 @@ mod import {
     pub mod no_named_as_default_member;
     pub mod no_self_import;
     pub mod no_webpack_loader_syntax;
+    pub mod unambiguous;
 }
 
 mod eslint {
@@ -94,6 +97,7 @@ mod eslint {
     pub mod no_new_wrappers;
     pub mod no_nonoctal_decimal_escape;
     pub mod no_obj_calls;
+    pub mod no_object_constructor;
     pub mod no_plusplus;
     pub mod no_proto;
     pub mod no_prototype_builtins;
@@ -158,6 +162,7 @@ mod typescript {
     pub mod no_duplicate_enum_values;
     pub mod no_dynamic_delete;
     pub mod no_empty_interface;
+    pub mod no_empty_object_type;
     pub mod no_explicit_any;
     pub mod no_extra_non_null_assertion;
     pub mod no_extraneous_class;
@@ -167,6 +172,7 @@ mod typescript {
     pub mod no_non_null_asserted_nullish_coalescing;
     pub mod no_non_null_asserted_optional_chain;
     pub mod no_non_null_assertion;
+    pub mod no_require_imports;
     pub mod no_this_alias;
     pub mod no_unnecessary_type_constraint;
     pub mod no_unsafe_declaration_merging;
@@ -238,6 +244,7 @@ mod jest {
 mod react {
     pub mod button_has_type;
     pub mod checked_requires_onchange_or_readonly;
+    pub mod exhaustive_deps;
     pub mod iframe_missing_sandbox;
     pub mod jsx_boolean_value;
     pub mod jsx_curly_brace_presence;
@@ -248,6 +255,7 @@ mod react {
     pub mod jsx_no_undef;
     pub mod jsx_no_useless_fragment;
     pub mod jsx_props_no_spread_multi;
+    pub mod no_array_index_key;
     pub mod no_children_prop;
     pub mod no_danger;
     pub mod no_danger_with_children;
@@ -278,6 +286,7 @@ mod react_perf {
 mod unicorn {
     pub mod catch_error_name;
     pub mod consistent_empty_array_spread;
+    pub mod consistent_existence_index_check;
     pub mod consistent_function_scoping;
     pub mod empty_brace_spaces;
     pub mod error_message;
@@ -353,6 +362,7 @@ mod unicorn {
     pub mod prefer_regexp_test;
     pub mod prefer_set_size;
     pub mod prefer_spread;
+    pub mod prefer_string_raw;
     pub mod prefer_string_replace_all;
     pub mod prefer_string_slice;
     pub mod prefer_string_starts_ends_with;
@@ -472,15 +482,12 @@ mod jsdoc {
     pub mod require_yields;
 }
 
-mod tree_shaking {
-    pub mod no_side_effects_in_initialization;
-}
-
 mod promise {
     pub mod avoid_new;
     pub mod catch_or_return;
     pub mod no_callback_in_promise;
     pub mod no_new_statics;
+    pub mod no_promise_in_callback;
     pub mod no_return_in_finally;
     pub mod param_names;
     pub mod prefer_await_to_callbacks;
@@ -521,6 +528,7 @@ oxc_macros::declare_all_lint_rules! {
     eslint::max_lines,
     eslint::max_params,
     eslint::no_duplicate_imports,
+    eslint::no_object_constructor,
     eslint::no_alert,
     eslint::no_array_constructor,
     eslint::no_async_promise_executor,
@@ -624,6 +632,8 @@ oxc_macros::declare_all_lint_rules! {
     eslint::valid_typeof,
     import::default,
     import::export,
+    import::first,
+    import::import_no_namespace,
     import::max_dependencies,
     import::named,
     import::namespace,
@@ -637,6 +647,7 @@ oxc_macros::declare_all_lint_rules! {
     import::no_named_as_default_member,
     import::no_self_import,
     import::no_webpack_loader_syntax,
+    import::unambiguous,
     jest::consistent_test_it,
     jest::expect_expect,
     jest::max_expects,
@@ -778,6 +789,7 @@ oxc_macros::declare_all_lint_rules! {
     oxc::uninvoked_array_callback,
     promise::avoid_new,
     promise::catch_or_return,
+    promise::no_promise_in_callback,
     promise::no_callback_in_promise,
     promise::no_new_statics,
     promise::no_return_in_finally,
@@ -788,6 +800,7 @@ oxc_macros::declare_all_lint_rules! {
     promise::valid_params,
     react::button_has_type,
     react::checked_requires_onchange_or_readonly,
+    react::exhaustive_deps,
     react::iframe_missing_sandbox,
     react::jsx_boolean_value,
     react::jsx_curly_brace_presence,
@@ -798,9 +811,10 @@ oxc_macros::declare_all_lint_rules! {
     react::jsx_no_undef,
     react::jsx_no_useless_fragment,
     react::jsx_props_no_spread_multi,
+    react::no_array_index_key,
     react::no_children_prop,
-    react::no_danger,
     react::no_danger_with_children,
+    react::no_danger,
     react::no_direct_mutation_state,
     react::no_find_dom_node,
     react::no_is_mounted,
@@ -821,7 +835,6 @@ oxc_macros::declare_all_lint_rules! {
     react_perf::jsx_no_new_function_as_prop,
     react_perf::jsx_no_new_object_as_prop,
     security::api_keys,
-    tree_shaking::no_side_effects_in_initialization,
     typescript::adjacent_overload_signatures,
     typescript::array_type,
     typescript::ban_ts_comment,
@@ -835,6 +848,7 @@ oxc_macros::declare_all_lint_rules! {
     typescript::no_duplicate_enum_values,
     typescript::no_dynamic_delete,
     typescript::no_empty_interface,
+    typescript::no_empty_object_type,
     typescript::no_explicit_any,
     typescript::no_extra_non_null_assertion,
     typescript::no_extraneous_class,
@@ -844,6 +858,7 @@ oxc_macros::declare_all_lint_rules! {
     typescript::no_non_null_asserted_nullish_coalescing,
     typescript::no_non_null_asserted_optional_chain,
     typescript::no_non_null_assertion,
+    typescript::no_require_imports,
     typescript::no_this_alias,
     typescript::no_unnecessary_type_constraint,
     typescript::no_unsafe_declaration_merging,
@@ -861,6 +876,7 @@ oxc_macros::declare_all_lint_rules! {
     typescript::triple_slash_reference,
     unicorn::catch_error_name,
     unicorn::consistent_empty_array_spread,
+    unicorn::consistent_existence_index_check,
     unicorn::consistent_function_scoping,
     unicorn::empty_brace_spaces,
     unicorn::error_message,
@@ -936,6 +952,7 @@ oxc_macros::declare_all_lint_rules! {
     unicorn::prefer_regexp_test,
     unicorn::prefer_set_size,
     unicorn::prefer_spread,
+    unicorn::prefer_string_raw,
     unicorn::prefer_string_replace_all,
     unicorn::prefer_string_slice,
     unicorn::prefer_string_starts_ends_with,

@@ -1,9 +1,9 @@
 commit: d20b314c
 
 parser_babel Summary:
-AST Parsed     : 2126/2136 (99.53%)
-Positive Passed: 2116/2136 (99.06%)
-Negative Passed: 1389/1506 (92.23%)
+AST Parsed     : 2197/2210 (99.41%)
+Positive Passed: 2183/2210 (98.78%)
+Negative Passed: 1510/1633 (92.47%)
 Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/annex-b/enabled/3.1-sloppy-labeled-functions-if-body/input.js
 Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/core/categorized/invalid-fn-decl-labeled-inside-if/input.js
 Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/core/categorized/invalid-fn-decl-labeled-inside-loop/input.js
@@ -27,6 +27,12 @@ Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/es
 Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2018/object-rest-spread/no-pattern-in-rest-with-ts/input.js
 Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2020/dynamic-import/invalid-trailing-comma/input.js
 Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2020/dynamic-import-createImportExpression-false/invalid-trailing-comma/input.js
+Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/failure-delete-optional-private-property/input.js
+Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/class-properties/super-inside-function/input.js
+Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/class-properties/yield-in-class-property-in-generator/input.js
+Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/class-static-block/invalid-decorators/input.js
+Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/private-in/invalid-private-followed-by-in-2/input.js
+Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/top-level-await-module/inside-class-property/input.js
 Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/esprima/es2015-arrow-function/invalid-param-strict-mode/input.js
 Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/esprima/es2015-generator/generator-parameter-binding-property-reserved/input.js
 Expect Syntax Error: tasks/coverage/babel/packages/babel-parser/test/fixtures/esprima/invalid-syntax/migrated_0101/input.js
@@ -138,6 +144,133 @@ Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/core/o
    ·                 ──────────
    ╰────
   help: new.target is only allowed in constructors and functions invoked using thew `new` operator
+Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/await-in-private-property-in-params-of-async-arrow/input.js
+
+  × Expected a semicolon or an implicit semicolon after a statement, but found none
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/await-in-private-property-in-params-of-async-arrow/input.js:1:33]
+ 1 │ async( x = class { #x = await }) => {}
+   ·                                 ▲
+   ╰────
+  help: Try insert a semicolon here
+Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/class-properties/arguments-in-key/input.js
+
+  × 'arguments' is not allowed in class field initializer
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/arguments-in-key/input.js:3:6]
+ 2 │   class A {
+ 3 │     [arguments] = 2;
+   ·      ─────────
+ 4 │   }
+   ╰────
+Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/class-properties/await-in-property-in-params-of-async-arrow/input.js
+
+  × Expected a semicolon or an implicit semicolon after a statement, but found none
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/await-in-property-in-params-of-async-arrow/input.js:1:32]
+ 1 │ async( x = class { x = await }) => {}
+   ·                                ▲
+   ╰────
+  help: Try insert a semicolon here
+Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/class-properties/new-target/input.js
+
+  × Unexpected new.target expression
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/new-target/input.js:2:14]
+ 1 │ class X {
+ 2 │   static a = new.target;
+   ·              ──────────
+ 3 │   static b = (foo = 1 + bar(new.target));
+   ╰────
+  help: new.target is only allowed in constructors and functions invoked using thew `new` operator
+
+  × Unexpected new.target expression
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/new-target/input.js:3:29]
+ 2 │   static a = new.target;
+ 3 │   static b = (foo = 1 + bar(new.target));
+   ·                             ──────────
+ 4 │   static c = () => new.target;
+   ╰────
+  help: new.target is only allowed in constructors and functions invoked using thew `new` operator
+
+  × Unexpected new.target expression
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/new-target/input.js:4:20]
+ 3 │   static b = (foo = 1 + bar(new.target));
+ 4 │   static c = () => new.target;
+   ·                    ──────────
+ 5 │   static d = (foo = new.target) => {};
+   ╰────
+  help: new.target is only allowed in constructors and functions invoked using thew `new` operator
+
+  × Unexpected new.target expression
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/new-target/input.js:5:21]
+ 4 │   static c = () => new.target;
+ 5 │   static d = (foo = new.target) => {};
+   ·                     ──────────
+ 6 │   e = new.target;
+   ╰────
+  help: new.target is only allowed in constructors and functions invoked using thew `new` operator
+
+  × Unexpected new.target expression
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/new-target/input.js:6:7]
+ 5 │   static d = (foo = new.target) => {};
+ 6 │   e = new.target;
+   ·       ──────────
+ 7 │   f = (foo = 1 + bar(new.target));
+   ╰────
+  help: new.target is only allowed in constructors and functions invoked using thew `new` operator
+
+  × Unexpected new.target expression
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/new-target/input.js:7:22]
+ 6 │   e = new.target;
+ 7 │   f = (foo = 1 + bar(new.target));
+   ·                      ──────────
+ 8 │   g = () => new.target;
+   ╰────
+  help: new.target is only allowed in constructors and functions invoked using thew `new` operator
+
+  × Unexpected new.target expression
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/new-target/input.js:8:13]
+ 7 │   f = (foo = 1 + bar(new.target));
+ 8 │   g = () => new.target;
+   ·             ──────────
+ 9 │   h = (foo = new.target) => {};
+   ╰────
+  help: new.target is only allowed in constructors and functions invoked using thew `new` operator
+
+  × Unexpected new.target expression
+    ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/new-target/input.js:9:14]
+  8 │   g = () => new.target;
+  9 │   h = (foo = new.target) => {};
+    ·              ──────────
+ 10 │ }
+    ╰────
+  help: new.target is only allowed in constructors and functions invoked using thew `new` operator
+Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/class-static-block/await-binding-in-initializer-in-static-block/input.js
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/await-binding-in-initializer-in-static-block/input.js:3:42]
+ 2 │ 
+ 3 │ C = class { static { class D { x = await } } };
+   ·                                          ─
+   ╰────
+Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/class-static-block/duplicate-function-var-name/input.js
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/duplicate-function-var-name/input.js:3:11]
+ 2 │     static {
+ 3 │       var x;
+   ·           ┬
+   ·           ╰── `x` has already been declared here
+ 4 │       function x() {}
+   ·                ┬
+   ·                ╰── It can not be redeclared here
+ 5 │     }
+   ╰────
+Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/es2022/top-level-await-unambiguous/module/input.js
+
+  × `await` is only allowed within async functions and at the top levels of modules
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/top-level-await-unambiguous/module/input.js:1:1]
+ 1 │ await 0
+   · ─────
+ 2 │ 
+   ╰────
 Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/jsx/errors/_no-plugin-ts-type-param-no-flow/input.js
 
   × Expected `<` but found `EOF`
@@ -5154,6 +5287,20 @@ Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/typesc
    ╰────
   help: Try insert a semicolon here
 
+  × Invalid assignment in object literal
+   ╭─[babel/packages/babel-parser/test/fixtures/es2017/async-functions/multiple-await-in-async-arrow-params/input.js:1:25]
+ 1 │ async ({ x = [ await ], y = { await } }) => {}
+   ·                         ─────────────
+   ╰────
+  help: Did you mean to use a ':'? An '=' can only follow a property name when the containing object literal is part of a destructuring pattern.
+
+  × Invalid assignment in object literal
+   ╭─[babel/packages/babel-parser/test/fixtures/es2017/async-functions/multiple-await-in-async-arrow-params/input.js:1:10]
+ 1 │ async ({ x = [ await ], y = { await } }) => {}
+   ·          ─────────────
+   ╰────
+  help: Did you mean to use a ':'? An '=' can only follow a property name when the containing object literal is part of a destructuring pattern.
+
   × Line terminator not permitted before arrow
    ╭─[babel/packages/babel-parser/test/fixtures/es2017/async-functions/newline-before-arrow/input.js:2:1]
  1 │ async x
@@ -6919,6 +7066,1243 @@ Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/typesc
    ╭─[babel/packages/babel-parser/test/fixtures/es2021/numeric-separator/template-with-invalid-numeric-separator-in-code-point/input.js:1:2]
  1 │ `abc\u{1000_0000}`;
    ·  ────────────────
+   ╰────
+
+  × Expected `in` but found `(`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-methods/asi-failure-generator/input.js:3:7]
+ 2 │   p = x
+ 3 │   *#m () {}
+   ·       ┬
+   ·       ╰── `in` expected
+ 4 │ }
+   ╰────
+
+  × Classes can't have an element named '#constructor'
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-methods/failure-name-constructor/input.js:2:3]
+ 1 │ class Foo {
+ 2 │   #constructor() {};
+   ·   ────────────
+ 3 │ }
+   ╰────
+
+  × Invalid Character ` `
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-methods/failure-spaces/input.js:2:4]
+ 1 │ class Spaces {
+ 2 │   #  wrongSpaces() {
+   ·    ─
+ 3 │     return fail();
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-field-instance-field/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x = 0;
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   #x = 0;
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-field-instance-get/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x = 0;
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   get #x() {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-field-instance-method/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x = 0;
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   #x() {}
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-field-instance-set/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x = 0;
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-field-static-field/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x = 0;
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-field-static-get/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x = 0;
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-field-static-method/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x = 0;
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   static #x() {}
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-field-static-set/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x = 0;
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-get-instance-field/input.js:2:7]
+ 1 │ class A {
+ 2 │   get #x() {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   #x = 0;
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-get-instance-get/input.js:2:7]
+ 1 │ class A {
+ 2 │   get #x() {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   get #x() {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-get-instance-method/input.js:2:7]
+ 1 │ class A {
+ 2 │   get #x() {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   #x() {}
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-get-static-field/input.js:2:7]
+ 1 │ class A {
+ 2 │   get #x() {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-get-static-get/input.js:2:7]
+ 1 │ class A {
+ 2 │   get #x() {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-get-static-method/input.js:2:7]
+ 1 │ class A {
+ 2 │   get #x() {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   static #x() {}
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-get-static-set/input.js:2:7]
+ 1 │ class A {
+ 2 │   get #x() {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-method-instance-field/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x() {}
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   #x = 0;
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-method-instance-get/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x() {}
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   get #x() {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-method-instance-method/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x() {}
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   #x() {}
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-method-instance-set/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x() {}
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-method-static-field/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x() {}
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-method-static-get/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x() {}
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-method-static-method/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x() {}
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   static #x() {}
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-method-static-set/input.js:2:3]
+ 1 │ class A {
+ 2 │   #x() {}
+   ·   ─┬
+   ·    ╰── `x` has already been declared here
+ 3 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-set-instance-field/input.js:2:7]
+ 1 │ class A {
+ 2 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   #x = 0;
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-set-instance-method/input.js:2:7]
+ 1 │ class A {
+ 2 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   #x() {}
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-set-instance-set/input.js:2:7]
+ 1 │ class A {
+ 2 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-set-static-field/input.js:2:7]
+ 1 │ class A {
+ 2 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-set-static-get/input.js:2:7]
+ 1 │ class A {
+ 2 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-set-static-method/input.js:2:7]
+ 1 │ class A {
+ 2 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   static #x() {}
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/instance-set-static-set/input.js:2:7]
+ 1 │ class A {
+ 2 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── `x` has already been declared here
+ 3 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-field-instance-field/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   #x = 0;
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-field-instance-get/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   get #x() {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-field-instance-method/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   #x() {}
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-field-instance-set/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-field-static-field/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-field-static-get/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-field-static-method/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   static #x() {}
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-field-static-set/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-get-instance-field/input.js:2:14]
+ 1 │ class A {
+ 2 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   #x = 0;
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-get-instance-get/input.js:2:14]
+ 1 │ class A {
+ 2 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   get #x() {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-get-instance-method/input.js:2:14]
+ 1 │ class A {
+ 2 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   #x() {}
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-get-instance-set/input.js:2:14]
+ 1 │ class A {
+ 2 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-get-static-field/input.js:2:14]
+ 1 │ class A {
+ 2 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-get-static-get/input.js:2:14]
+ 1 │ class A {
+ 2 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-get-static-method/input.js:2:14]
+ 1 │ class A {
+ 2 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   static #x() {}
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-method-instance-field/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x() {}
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   #x = 0;
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-method-instance-get/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x() {}
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   get #x() {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-method-instance-method/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x() {}
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   #x() {}
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-method-instance-set/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x() {}
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-method-static-field/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x() {}
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-method-static-get/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x() {}
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   static get #x() {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-method-static-method/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x() {}
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   static #x() {}
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-method-static-set/input.js:2:10]
+ 1 │ class A {
+ 2 │   static #x() {}
+   ·          ─┬
+   ·           ╰── `x` has already been declared here
+ 3 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-set-instance-field/input.js:2:14]
+ 1 │ class A {
+ 2 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   #x = 0;
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-set-instance-get/input.js:2:14]
+ 1 │ class A {
+ 2 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   get #x() {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-set-instance-method/input.js:2:14]
+ 1 │ class A {
+ 2 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   #x() {}
+   ·   ─┬
+   ·    ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-set-instance-set/input.js:2:14]
+ 1 │ class A {
+ 2 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   set #x(_) {}
+   ·       ─┬
+   ·        ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-set-static-field/input.js:2:14]
+ 1 │ class A {
+ 2 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   static #x = 0;
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-set-static-method/input.js:2:14]
+ 1 │ class A {
+ 2 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   static #x() {}
+   ·          ─┬
+   ·           ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Identifier `x` has already been declared
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-names-duplicated/static-set-static-set/input.js:2:14]
+ 1 │ class A {
+ 2 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── `x` has already been declared here
+ 3 │   static set #x(_) {}
+   ·              ─┬
+   ·               ╰── It can not be redeclared here
+ 4 │ }
+   ╰────
+
+  × Expected a semicolon or an implicit semicolon after a statement, but found none
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/asi-failure-generator/input.js:3:8]
+ 2 │   #p = x
+ 3 │   *m () {}
+   ·        ▲
+ 4 │ }
+   ╰────
+  help: Try insert a semicolon here
+
+  × Expected a semicolon or an implicit semicolon after a statement, but found none
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/asi-failure-inline/input.js:2:5]
+ 1 │ class Foo {
+ 2 │   #x #y
+   ·     ▲
+ 3 │ }
+   ╰────
+  help: Try insert a semicolon here
+
+  × Invalid Character `[`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/failure-computed/input.js:3:4]
+ 2 │   #p = x
+ 3 │   #[m] = 1
+   ·    ─
+ 4 │ }
+   ╰────
+
+  × Private fields can not be deleted
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/failure-delete-private-property/input.js:4:12]
+ 3 │   constructor() {
+ 4 │     delete this.#x;
+   ·            ───────
+ 5 │   }
+   ╰────
+
+  × Classes can't have an element named '#constructor'
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/failure-name-constructor/input.js:2:3]
+ 1 │ class Foo {
+ 2 │   #constructor;
+   ·   ────────────
+ 3 │ }
+   ╰────
+
+  × Invalid Character `2`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/failure-numeric-literal/input.js:2:4]
+ 1 │ class Foo {
+ 2 │   #2 = y
+   ·    ─
+ 3 │ }
+   ╰────
+
+  × Invalid Character `2`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/failure-numeric-start-identifier/input.js:2:4]
+ 1 │ class Foo {
+ 2 │   #2x = y
+   ·    ─
+ 3 │ }
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/failure-shorthand/input.js:4:12]
+ 3 │   constructor() {
+ 4 │     delete #x;
+   ·            ──
+ 5 │   }
+   ╰────
+
+  × Invalid Character ` `
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/failure-spaces/input.js:2:4]
+ 1 │ class Spaces {
+ 2 │   #  wrongSpaces;
+   ·    ─
+ 3 │ }
+   ╰────
+
+  × Invalid Character `"`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/failure-string-literal/input.js:2:4]
+ 1 │ class Foo {
+ 2 │   #"p" = x
+   ·    ─
+ 3 │ }
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/invalid-object-method/input.js:2:11]
+ 1 │ class C {
+ 2 │   #p = ({ #x() {} });
+   ·           ──
+ 3 │ }
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/invalid-object-property/input.js:2:11]
+ 1 │ class C {
+ 2 │   #p = ({ #x: 42 });
+   ·           ──
+ 3 │ }
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/invalid-object-property-with-assignment/input.js:4:5]
+ 3 │   m = {
+ 4 │     #x: x,
+   ·     ──
+ 5 │     y: y = m
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/invalid-ts-type-literal/input.js:2:3]
+ 1 │ interface I {
+ 2 │   #p: string
+   ·   ──
+ 3 │ }
+   ╰────
+
+  × Super calls are not permitted outside constructors or in nested functions inside constructors.
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/super-call/input.js:4:14]
+ 3 │     class C extends D {
+ 4 │       #foo = super();
+   ·              ───────
+ 5 │     }
+   ╰────
+
+  × Private fields cannot be accessed on super
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/super-private-member-access/input.js:5:5]
+ 4 │   method() {
+ 5 │     super.#x;
+   ·     ────────
+ 6 │   }
+   ╰────
+
+  × Private field 'priv' must be declared in an enclosing class
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/undeclared-nested/input.js:4:20]
+ 3 │   meth() {
+ 4 │     var prop = foo.#priv;
+   ·                    ─────
+ 5 │   }
+   ╰────
+
+  × Private identifier '#priv' is not allowed outside class bodies
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-private-properties/undeclared-top-level/input.js:1:16]
+ 1 │ var prop = foo.#priv;
+   ·                ─────
+   ╰────
+
+  × 'arguments' is not allowed in class field initializer
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/arguments/input.js:3:11]
+ 2 │   class A {
+ 3 │     foo = arguments;
+   ·           ─────────
+ 4 │   }
+   ╰────
+
+  × 'arguments' is not allowed in class field initializer
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/arguments-in-arrow-function/input.js:3:17]
+ 2 │   class A {
+ 3 │     foo = () => arguments;
+   ·                 ─────────
+ 4 │   }
+   ╰────
+
+  × 'arguments' is not allowed in class field initializer
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/arguments-in-nested-class-decorator-call-expression/input.js:3:26]
+ 2 │   class A {
+ 3 │     foo = class B { @bar(arguments) foo };
+   ·                          ─────────
+ 4 │   }
+   ╰────
+
+  × Expected a semicolon or an implicit semicolon after a statement, but found none
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/asi-failure-computed/input.js:3:9]
+ 2 │   p = x
+ 3 │   [m] () {}
+   ·         ▲
+ 4 │ }
+   ╰────
+  help: Try insert a semicolon here
+
+  × Expected a semicolon or an implicit semicolon after a statement, but found none
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/asi-failure-generator/input.js:3:8]
+ 2 │   p = x
+ 3 │   *m () {}
+   ·        ▲
+ 4 │ }
+   ╰────
+  help: Try insert a semicolon here
+
+  × Expected a semicolon or an implicit semicolon after a statement, but found none
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/asi-failure-inline/input.js:2:4]
+ 1 │ class Foo {
+ 2 │   x y
+   ·    ▲
+ 3 │ }
+   ╰────
+  help: Try insert a semicolon here
+
+  × Expected a semicolon or an implicit semicolon after a statement, but found none
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/await-in-computed-property-in-params-of-async-arrow/input.js:1:34]
+ 1 │ async( x = class { [await] = x }) => {}
+   ·                                  ▲
+   ╰────
+  help: Try insert a semicolon here
+
+  × Unexpected new.target expression
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/new-target-invalid/input.js:1:9]
+ 1 │ var x = new.target;
+   ·         ──────────
+   ╰────
+  help: new.target is only allowed in constructors and functions invoked using thew `new` operator
+
+  × Classes can't have a field named 'constructor'
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/no-ctor/input.js:2:3]
+ 1 │ class Foo {
+ 2 │   constructor
+   ·   ───────────
+ 3 │ }
+   ╰────
+
+  × Classes can't have a field named 'constructor'
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/no-ctor-2/input.js:2:3]
+ 1 │ class Foo {
+ 2 │   constructor
+   ·   ───────────
+ 3 │   *x(){}
+   ╰────
+
+  × Classes may not have a static property named prototype
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/no-static-prototype/input.js:2:10]
+ 1 │ class Foo {
+ 2 │   static prototype
+   ·          ─────────
+ 3 │ }
+   ╰────
+
+  × Classes may not have a static property named prototype
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/no-static-prototype-2/input.js:2:10]
+ 1 │ class Foo {
+ 2 │   static prototype
+   ·          ─────────
+ 3 │   *x(){}
+   ╰────
+
+  × Classes can't have a field named 'constructor'
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/static-field-named-constructor/input.js:2:12]
+ 1 │ class Foo {
+ 2 │     static constructor;
+   ·            ───────────
+ 3 │ }
+   ╰────
+
+  × Super calls are not permitted outside constructors or in nested functions inside constructors.
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-properties/super-call/input.js:4:13]
+ 3 │     class C extends D {
+ 4 │       foo = super();
+   ·             ───────
+ 5 │     }
+   ╰────
+
+  × Cannot use `await` as an identifier in an async context
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/await-binding-in-async-arrow-function-in-static-block/input.js:3:29]
+ 2 │ // await is not allowed in async arrow
+ 3 │ C = class { static { async (await) => {} } };
+   ·                             ─────
+ 4 │ 
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/await-binding-in-async-arrow-function-in-static-block/input.js:5:38]
+ 4 │ 
+ 5 │ C = class { static { async (x = await) => {} } };
+   ·                                      ─
+ 6 │ 
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/await-binding-in-static-block/input.js:3:28]
+ 2 │ // This file enumerates all the disallowed cases, for allowed cases, see await-binding-*
+ 3 │ C = class { static { await } };
+   ·                            ─
+ 4 │ 
+   ╰────
+
+  × 'arguments' is not allowed in static initialization block
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/invalid-arguments/input.js:3:16]
+ 2 │   static {
+ 3 │     this.foo = arguments;
+   ·                ─────────
+ 4 │   }
+   ╰────
+
+  × Cannot use await in class static initialization block
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/invalid-await/input.js:5:7]
+ 4 │     static {
+ 5 │       await 42;
+   ·       ─────
+ 6 │     }
+   ╰────
+
+  × Illegal break statement
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/invalid-break/input.js:6:9]
+ 5 │       static {
+ 6 │         break;
+   ·         ──────
+ 7 │       }
+   ╰────
+  help: A `break` statement can only be used within an enclosing iteration or switch statement.
+
+  × Illegal continue statement: no surrounding iteration statement
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/invalid-continue/input.js:5:7]
+ 4 │     static {
+ 5 │       continue;
+   ·       ─────────
+ 6 │     }
+   ╰────
+  help: A `continue` statement can only be used within an enclosing `for`, `while` or `do while`
+
+  × '0'-prefixed octal literals and octal escape sequences are deprecated
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/invalid-legacy-octal/input.js:4:5]
+ 3 │   static {
+ 4 │     042;
+   ·     ───
+ 5 │   }
+   ╰────
+  help: for octal literals use the '0o' prefix instead
+
+  × TS(1108): A 'return' statement can only be used within a function body.
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/invalid-return/input.js:4:5]
+ 3 │   static {
+ 4 │     return this;
+   ·     ──────
+ 5 │   }
+   ╰────
+
+  × Super calls are not permitted outside constructors or in nested functions inside constructors.
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/invalid-super-call/input.js:5:5]
+ 4 │   static {
+ 5 │     super();
+   ·     ───────
+ 6 │   }
+   ╰────
+
+  × A 'yield' expression is only allowed in a generator body.
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/class-static-block/invalid-yield/input.js:5:7]
+ 4 │     static {
+ 5 │       yield 42;
+   ·       ─────
+ 6 │     }
+   ╰────
+
+  × Duplicated export 'foo'
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/module-string-names/duplicate-exported-binding-check/input.js:2:10]
+ 1 │ const foo = 42, bar = 42;
+ 2 │ export { foo, bar as "foo" }
+   ·          ─┬─         ──┬──
+   ·           │            ╰── It cannot be redeclared here
+   ·           ╰── Export has already been declared here
+   ╰────
+
+  × An export name cannot include a unicode lone surrogate
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/module-string-names/export-name-has-lone-surrogate/input.js:2:17]
+ 1 │ const foo = 42, bar = 42;
+ 2 │ export { foo as "\ud800\udbff" } // should throw
+   ·                 ──────────────
+ 3 │ export { bar as "\udbff\udfff" } // should not throw
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/module-string-names/import-local-is-string/input.js:1:10]
+ 1 │ import { "foo" } from "foo";
+   ·          ─────
+   ╰────
+
+  × A string literal cannot be used as an exported binding without `from`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/module-string-names/string-exported-binding-without-from/input.js:1:10]
+ 1 │ export { "學而時習之，不亦說乎？", "吾道一以貫之。" as "忠恕。" };
+   ·          ────────────────────────
+   ╰────
+  help: Did you mean `export { "學而時習之，不亦說乎？" as "學而時習之，不亦說乎？" } from 'some-module'`?
+
+  × A string literal cannot be used as an exported binding without `from`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/module-string-names/string-exported-binding-without-from/input.js:1:47]
+ 1 │ export { "學而時習之，不亦說乎？", "吾道一以貫之。" as "忠恕。" };
+   ·                                    ────────────────
+   ╰────
+  help: Did you mean `export { "吾道一以貫之。" as "忠恕。" } from 'some-module'`?
+
+  × Export '學而時習之，不亦說乎？' is not defined
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/module-string-names/string-exported-binding-without-from/input.js:1:10]
+ 1 │ export { "學而時習之，不亦說乎？", "吾道一以貫之。" as "忠恕。" };
+   ·          ────────────────────────
+   ╰────
+
+  × Export '吾道一以貫之。' is not defined
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/module-string-names/string-exported-binding-without-from/input.js:1:47]
+ 1 │ export { "學而時習之，不亦說乎？", "吾道一以貫之。" as "忠恕。" };
+   ·                                    ────────────────
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/private-in/invalid-private-followed-by-in-1/input.js:5:11]
+ 4 │   method() {
+ 5 │     #a in #b in c
+   ·           ──
+ 6 │   }
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/private-in/invalid-private-followed-by-in-3/input.js:5:18]
+ 4 │   method() {
+ 5 │     for (var x = #a in y);
+   ·                  ──
+ 6 │   }
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/private-in/invalid-private-followed-by-in-4/input.js:4:11]
+ 3 │   async test() {
+ 4 │     await #x in this
+   ·           ──
+ 5 │   }
+   ╰────
+
+  × Expected `in` but found `+`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/private-in/private-binary-expression-left/input.js:4:8]
+ 3 │   test() {
+ 4 │     #x + 1;
+   ·        ┬
+   ·        ╰── `in` expected
+ 5 │   }
+   ╰────
+
+  × Expected `in` but found `;`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/private-in/private-binary-expression-right/input.js:4:11]
+ 3 │   test() {
+ 4 │     1 + #x;
+   ·           ┬
+   ·           ╰── `in` expected
+ 5 │   }
+   ╰────
+
+  × Expected `in` but found `;`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/private-in/private-expression/input.js:4:7]
+ 3 │   test() {
+ 4 │     #x;
+   ·       ┬
+   ·       ╰── `in` expected
+ 5 │   }
+   ╰────
+
+  × Expected `in` but found `)`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/private-in/private-in-parenthesized/input.js:4:8]
+ 3 │   test() {
+ 4 │     (#x) in {};
+   ·        ┬
+   ·        ╰── `in` expected
+ 5 │   }
+   ╰────
+
+  × Private field 'x' must be declared in an enclosing class
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/private-in/private-in-without-field/input.js:3:5]
+ 2 │   test() {
+ 3 │     #x in {};
+   ·     ──
+ 4 │   }
+   ╰────
+
+  × `await` is only allowed within async functions and at the top levels of modules
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/top-level-await-module/inside-arrow/input.js:1:7]
+ 1 │ () => await 0;
+   ·       ─────
+   ╰────
+
+  × `await` is only allowed within async functions and at the top levels of modules
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/top-level-await-module/inside-function/input.js:2:3]
+ 1 │ function fn() {
+ 2 │   await 0;
+   ·   ─────
+ 3 │ }
+   ╰────
+
+  × Expected `(` but found `await`
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/top-level-await-script/for-await/input.js:1:5]
+ 1 │ for await (const a of b);
+   ·     ──┬──
+   ·       ╰── `(` expected
+   ╰────
+
+  × `await` is only allowed within async functions and at the top levels of modules
+   ╭─[babel/packages/babel-parser/test/fixtures/es2022/top-level-await-script/top-level/input.js:1:1]
+ 1 │ await 0;
+   · ─────
    ╰────
 
   × Invalid regular expression: Invalid unicode flags combination `u` and `v`

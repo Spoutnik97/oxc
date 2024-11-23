@@ -5,7 +5,7 @@
 //!
 //! See:
 //! * [visitor pattern](https://rust-unofficial.github.io/patterns/patterns/behavioural/visitor.html)
-//! * [rustc visitor](https://github.com/rust-lang/rust/blob/master/compiler/rustc_ast/src/visit.rs)
+//! * [rustc visitor](https://github.com/rust-lang/rust/blob/1.82.0/compiler/rustc_ast/src/visit.rs)
 
 #![allow(
     unused_variables,
@@ -2909,6 +2909,7 @@ pub mod walk {
     pub fn walk_chain_element<'a, V: Visit<'a>>(visitor: &mut V, it: &ChainElement<'a>) {
         match it {
             ChainElement::CallExpression(it) => visitor.visit_call_expression(it),
+            ChainElement::TSNonNullExpression(it) => visitor.visit_ts_non_null_expression(it),
             match_member_expression!(ChainElement) => {
                 visitor.visit_member_expression(it.to_member_expression())
             }
@@ -3157,9 +3158,6 @@ pub mod walk {
         visitor.enter_node(kind);
         visitor.visit_property_key(&it.key);
         visitor.visit_expression(&it.value);
-        if let Some(init) = &it.init {
-            visitor.visit_expression(init);
-        }
         visitor.leave_node(kind);
     }
 
@@ -3809,11 +3807,8 @@ pub mod walk {
     #[inline]
     pub fn walk_ts_enum_member_name<'a, V: Visit<'a>>(visitor: &mut V, it: &TSEnumMemberName<'a>) {
         match it {
-            TSEnumMemberName::StaticIdentifier(it) => visitor.visit_identifier_name(it),
-            TSEnumMemberName::StaticStringLiteral(it) => visitor.visit_string_literal(it),
-            TSEnumMemberName::StaticTemplateLiteral(it) => visitor.visit_template_literal(it),
-            TSEnumMemberName::StaticNumericLiteral(it) => visitor.visit_numeric_literal(it),
-            match_expression!(TSEnumMemberName) => visitor.visit_expression(it.to_expression()),
+            TSEnumMemberName::Identifier(it) => visitor.visit_identifier_name(it),
+            TSEnumMemberName::String(it) => visitor.visit_string_literal(it),
         }
     }
 

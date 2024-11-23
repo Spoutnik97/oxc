@@ -19,6 +19,12 @@ export interface NumericLiteral extends Span {
   raw: string;
 }
 
+export interface StringLiteral extends Span {
+  type: 'Literal';
+  value: string;
+  raw?: undefined;
+}
+
 export interface BigIntLiteral extends Span {
   type: 'Literal';
   raw: string;
@@ -39,11 +45,6 @@ export interface RegExp {
 }
 
 export type RegExpPattern = string | string | Pattern;
-
-export interface StringLiteral extends Span {
-  type: 'StringLiteral';
-  value: string;
-}
 
 export interface Program extends Span {
   type: 'Program';
@@ -138,7 +139,6 @@ export interface ObjectProperty extends Span {
   kind: PropertyKind;
   key: PropertyKey;
   value: Expression;
-  init: Expression | null;
   method: boolean;
   shorthand: boolean;
   computed: boolean;
@@ -386,14 +386,12 @@ export type AssignmentTargetPattern = ArrayAssignmentTarget | ObjectAssignmentTa
 
 export interface ArrayAssignmentTarget extends Span {
   type: 'ArrayAssignmentTarget';
-  elements: Array<AssignmentTargetMaybeDefault | AssignmentTargetRest | null>;
-  rest: AssignmentTargetRest | null;
+  elements: Array<AssignmentTargetRest | AssignmentTargetMaybeDefault | null>;
 }
 
 export interface ObjectAssignmentTarget extends Span {
   type: 'ObjectAssignmentTarget';
-  properties: Array<AssignmentTargetProperty | AssignmentTargetRest>;
-  rest: AssignmentTargetRest | null;
+  properties: Array<AssignmentTargetRest | AssignmentTargetProperty>;
 }
 
 export interface AssignmentTargetRest extends Span {
@@ -454,7 +452,12 @@ export interface ChainExpression extends Span {
   expression: ChainElement;
 }
 
-export type ChainElement = CallExpression | ComputedMemberExpression | StaticMemberExpression | PrivateFieldExpression;
+export type ChainElement =
+  | CallExpression
+  | TSNonNullExpression
+  | ComputedMemberExpression
+  | StaticMemberExpression
+  | PrivateFieldExpression;
 
 export interface ParenthesizedExpression extends Span {
   type: 'ParenthesizedExpression';
@@ -730,8 +733,7 @@ export interface AssignmentPattern extends Span {
 
 export interface ObjectPattern extends Span {
   type: 'ObjectPattern';
-  properties: Array<BindingProperty | BindingRestElement>;
-  rest: BindingRestElement | null;
+  properties: Array<BindingRestElement | BindingProperty>;
 }
 
 export interface BindingProperty extends Span {
@@ -744,8 +746,7 @@ export interface BindingProperty extends Span {
 
 export interface ArrayPattern extends Span {
   type: 'ArrayPattern';
-  elements: Array<BindingPattern | BindingRestElement | null>;
-  rest: BindingRestElement | null;
+  elements: Array<BindingRestElement | BindingPattern | null>;
 }
 
 export interface BindingRestElement extends Span {
@@ -1045,53 +1046,7 @@ export interface TSEnumMember extends Span {
   initializer: Expression | null;
 }
 
-export type TSEnumMemberName =
-  | IdentifierName
-  | StringLiteral
-  | TemplateLiteral
-  | NumericLiteral
-  | BooleanLiteral
-  | NullLiteral
-  | NumericLiteral
-  | BigIntLiteral
-  | RegExpLiteral
-  | StringLiteral
-  | TemplateLiteral
-  | IdentifierReference
-  | MetaProperty
-  | Super
-  | ArrayExpression
-  | ArrowFunctionExpression
-  | AssignmentExpression
-  | AwaitExpression
-  | BinaryExpression
-  | CallExpression
-  | ChainExpression
-  | Class
-  | ConditionalExpression
-  | Function
-  | ImportExpression
-  | LogicalExpression
-  | NewExpression
-  | ObjectExpression
-  | ParenthesizedExpression
-  | SequenceExpression
-  | TaggedTemplateExpression
-  | ThisExpression
-  | UnaryExpression
-  | UpdateExpression
-  | YieldExpression
-  | PrivateInExpression
-  | JSXElement
-  | JSXFragment
-  | TSAsExpression
-  | TSSatisfiesExpression
-  | TSTypeAssertion
-  | TSNonNullExpression
-  | TSInstantiationExpression
-  | ComputedMemberExpression
-  | StaticMemberExpression
-  | PrivateFieldExpression;
+export type TSEnumMemberName = IdentifierName | StringLiteral;
 
 export interface TSTypeAnnotation extends Span {
   type: 'TSTypeAnnotation';
@@ -1764,16 +1719,16 @@ export type AssignmentOperator =
   | '*='
   | '/='
   | '%='
+  | '**='
   | '<<='
   | '>>='
   | '>>>='
   | '|='
   | '^='
   | '&='
-  | '&&='
   | '||='
-  | '??='
-  | '**=';
+  | '&&='
+  | '??=';
 
 export type BinaryOperator =
   | '=='
@@ -1784,24 +1739,24 @@ export type BinaryOperator =
   | '<='
   | '>'
   | '>='
-  | '<<'
-  | '>>'
-  | '>>>'
   | '+'
   | '-'
   | '*'
   | '/'
   | '%'
+  | '**'
+  | '<<'
+  | '>>'
+  | '>>>'
   | '|'
   | '^'
   | '&'
   | 'in'
-  | 'instanceof'
-  | '**';
+  | 'instanceof';
 
 export type LogicalOperator = '||' | '&&' | '??';
 
-export type UnaryOperator = '-' | '+' | '!' | '~' | 'typeof' | 'void' | 'delete';
+export type UnaryOperator = '+' | '-' | '!' | '~' | 'typeof' | 'void' | 'delete';
 
 export type UpdateOperator = '++' | '--';
 

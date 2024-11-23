@@ -79,6 +79,7 @@ impl<'a, 'ctx> Traverse<'a> for TypeScript<'a, 'ctx> {
 
     fn exit_program(&mut self, program: &mut Program<'a>, ctx: &mut TraverseCtx<'a>) {
         self.annotations.exit_program(program, ctx);
+        self.module.exit_program(program, ctx);
     }
 
     fn enter_arrow_function_expression(
@@ -103,6 +104,10 @@ impl<'a, 'ctx> Traverse<'a> for TypeScript<'a, 'ctx> {
 
     fn enter_call_expression(&mut self, expr: &mut CallExpression<'a>, ctx: &mut TraverseCtx<'a>) {
         self.annotations.enter_call_expression(expr, ctx);
+    }
+
+    fn enter_chain_element(&mut self, element: &mut ChainElement<'a>, ctx: &mut TraverseCtx<'a>) {
+        self.annotations.enter_chain_element(element, ctx);
     }
 
     fn enter_class(&mut self, class: &mut Class<'a>, ctx: &mut TraverseCtx<'a>) {
@@ -215,6 +220,7 @@ impl<'a, 'ctx> Traverse<'a> for TypeScript<'a, 'ctx> {
 
     fn enter_statement(&mut self, stmt: &mut Statement<'a>, ctx: &mut TraverseCtx<'a>) {
         self.r#enum.enter_statement(stmt, ctx);
+        self.module.enter_statement(stmt, ctx);
     }
 
     fn exit_statement(&mut self, stmt: &mut Statement<'a>, ctx: &mut TraverseCtx<'a>) {
@@ -297,13 +303,5 @@ impl<'a, 'ctx> Traverse<'a> for TypeScript<'a, 'ctx> {
         if let Some(rewrite_extensions) = &mut self.rewrite_extensions {
             rewrite_extensions.enter_export_named_declaration(node, ctx);
         }
-    }
-
-    fn enter_ts_export_assignment(
-        &mut self,
-        node: &mut TSExportAssignment<'a>,
-        ctx: &mut TraverseCtx<'a>,
-    ) {
-        self.module.enter_ts_export_assignment(node, ctx);
     }
 }

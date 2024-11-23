@@ -122,13 +122,12 @@ impl<'a> TypeScriptEnum<'a> {
         } else {
             // }(Foo || {});
             let op = LogicalOperator::Or;
-            let left = ctx.create_bound_reference_id(
+            let left = ctx.create_bound_ident_expr(
                 decl.id.span,
                 enum_name.clone(),
                 var_symbol_id,
                 ReferenceFlags::Read,
             );
-            let left = Expression::Identifier(ctx.alloc(left));
             let right = ast.expression_object(SPAN, ast.vec(), None);
             let expression = ast.expression_logical(SPAN, left, op, right);
             ast.vec1(Argument::from(expression))
@@ -138,7 +137,7 @@ impl<'a> TypeScriptEnum<'a> {
 
         if is_already_declared {
             let op = AssignmentOperator::Assign;
-            let left = ctx.create_bound_reference_id(
+            let left = ctx.create_bound_ident_reference(
                 decl.id.span,
                 enum_name.clone(),
                 var_symbol_id,
@@ -193,18 +192,8 @@ impl<'a> TypeScriptEnum<'a> {
 
         for member in members.iter_mut() {
             let member_name: &Atom<'_> = match &member.id {
-                TSEnumMemberName::StaticIdentifier(id) => &id.name,
-                TSEnumMemberName::StaticStringLiteral(str)
-                | TSEnumMemberName::StringLiteral(str) => &str.value,
-                TSEnumMemberName::StaticTemplateLiteral(template)
-                | TSEnumMemberName::TemplateLiteral(template) => {
-                    &template.quasi().expect("Template enum members cannot have substitutions.")
-                }
-                // parse error, but better than a panic
-                TSEnumMemberName::StaticNumericLiteral(n) => &Atom::from(n.raw),
-                match_expression!(TSEnumMemberName) => {
-                    unreachable!()
-                }
+                TSEnumMemberName::Identifier(id) => &id.name,
+                TSEnumMemberName::String(str) => &str.value,
             };
 
             let init = if let Some(initializer) = &mut member.initializer {

@@ -38,6 +38,8 @@ pub struct BabelPlugins {
     pub react_jsx_self: bool,
     pub react_jsx_source: bool,
     pub react_display_name: bool,
+    // modules
+    pub modules_commonjs: bool,
     // regexp
     pub sticky_flag: bool,
     pub unicode_flag: bool,
@@ -60,6 +62,7 @@ pub struct BabelPlugins {
     // ES2019
     pub optional_catch_binding: bool,
     // ES2020
+    pub optional_chaining: bool,
     pub nullish_coalescing_operator: bool,
     // ES2021
     pub logical_assignment_operators: bool,
@@ -100,6 +103,7 @@ impl TryFrom<PluginPresetEntries> for BabelPlugins {
                 "transform-react-display-name" => p.react_display_name = true,
                 "transform-react-jsx-self" => p.react_jsx_self = true,
                 "transform-react-jsx-source" => p.react_jsx_source = true,
+                "transform-modules-commonjs" => p.modules_commonjs = true,
                 "transform-sticky-regex" => p.sticky_flag = true,
                 "transform-unicode-regex" => p.unicode_flag = true,
                 "transform-dotall-regex" => p.dot_all_flag = true,
@@ -124,6 +128,7 @@ impl TryFrom<PluginPresetEntries> for BabelPlugins {
                 }
                 "transform-async-generator-functions" => p.async_generator_functions = true,
                 "transform-optional-catch-binding" => p.optional_catch_binding = true,
+                "transform-optional-chaining" => p.optional_chaining = true,
                 "transform-nullish-coalescing-operator" => p.nullish_coalescing_operator = true,
                 "transform-logical-assignment-operators" => p.logical_assignment_operators = true,
                 "transform-class-static-block" => p.class_static_block = true,

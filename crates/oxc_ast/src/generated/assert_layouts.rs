@@ -25,6 +25,11 @@ const _: () = {
     assert!(offset_of!(NumericLiteral, raw) == 16usize);
     assert!(offset_of!(NumericLiteral, base) == 32usize);
 
+    assert!(size_of::<StringLiteral>() == 24usize);
+    assert!(align_of::<StringLiteral>() == 8usize);
+    assert!(offset_of!(StringLiteral, span) == 0usize);
+    assert!(offset_of!(StringLiteral, value) == 8usize);
+
     assert!(size_of::<BigIntLiteral>() == 32usize);
     assert!(align_of::<BigIntLiteral>() == 8usize);
     assert!(offset_of!(BigIntLiteral, span) == 0usize);
@@ -44,11 +49,6 @@ const _: () = {
 
     assert!(size_of::<RegExpPattern>() == 24usize);
     assert!(align_of::<RegExpPattern>() == 8usize);
-
-    assert!(size_of::<StringLiteral>() == 24usize);
-    assert!(align_of::<StringLiteral>() == 8usize);
-    assert!(offset_of!(StringLiteral, span) == 0usize);
-    assert!(offset_of!(StringLiteral, value) == 8usize);
 
     assert!(size_of::<Program>() == 160usize);
     assert!(align_of::<Program>() == 8usize);
@@ -112,16 +112,15 @@ const _: () = {
     assert!(size_of::<ObjectPropertyKind>() == 16usize);
     assert!(align_of::<ObjectPropertyKind>() == 8usize);
 
-    assert!(size_of::<ObjectProperty>() == 72usize);
+    assert!(size_of::<ObjectProperty>() == 56usize);
     assert!(align_of::<ObjectProperty>() == 8usize);
     assert!(offset_of!(ObjectProperty, span) == 0usize);
     assert!(offset_of!(ObjectProperty, kind) == 8usize);
     assert!(offset_of!(ObjectProperty, key) == 16usize);
     assert!(offset_of!(ObjectProperty, value) == 32usize);
-    assert!(offset_of!(ObjectProperty, init) == 48usize);
-    assert!(offset_of!(ObjectProperty, method) == 64usize);
-    assert!(offset_of!(ObjectProperty, shorthand) == 65usize);
-    assert!(offset_of!(ObjectProperty, computed) == 66usize);
+    assert!(offset_of!(ObjectProperty, method) == 48usize);
+    assert!(offset_of!(ObjectProperty, shorthand) == 49usize);
+    assert!(offset_of!(ObjectProperty, computed) == 50usize);
 
     assert!(size_of::<PropertyKey>() == 16usize);
     assert!(align_of::<PropertyKey>() == 8usize);
@@ -1582,6 +1581,11 @@ const _: () = {
     assert!(offset_of!(NumericLiteral, raw) == 16usize);
     assert!(offset_of!(NumericLiteral, base) == 24usize);
 
+    assert!(size_of::<StringLiteral>() == 16usize);
+    assert!(align_of::<StringLiteral>() == 4usize);
+    assert!(offset_of!(StringLiteral, span) == 0usize);
+    assert!(offset_of!(StringLiteral, value) == 8usize);
+
     assert!(size_of::<BigIntLiteral>() == 20usize);
     assert!(align_of::<BigIntLiteral>() == 4usize);
     assert!(offset_of!(BigIntLiteral, span) == 0usize);
@@ -1601,11 +1605,6 @@ const _: () = {
 
     assert!(size_of::<RegExpPattern>() == 12usize);
     assert!(align_of::<RegExpPattern>() == 4usize);
-
-    assert!(size_of::<StringLiteral>() == 16usize);
-    assert!(align_of::<StringLiteral>() == 4usize);
-    assert!(offset_of!(StringLiteral, span) == 0usize);
-    assert!(offset_of!(StringLiteral, value) == 8usize);
 
     assert!(size_of::<Program>() == 88usize);
     assert!(align_of::<Program>() == 4usize);
@@ -1669,16 +1668,15 @@ const _: () = {
     assert!(size_of::<ObjectPropertyKind>() == 8usize);
     assert!(align_of::<ObjectPropertyKind>() == 4usize);
 
-    assert!(size_of::<ObjectProperty>() == 40usize);
+    assert!(size_of::<ObjectProperty>() == 32usize);
     assert!(align_of::<ObjectProperty>() == 4usize);
     assert!(offset_of!(ObjectProperty, span) == 0usize);
     assert!(offset_of!(ObjectProperty, kind) == 8usize);
     assert!(offset_of!(ObjectProperty, key) == 12usize);
     assert!(offset_of!(ObjectProperty, value) == 20usize);
-    assert!(offset_of!(ObjectProperty, init) == 28usize);
-    assert!(offset_of!(ObjectProperty, method) == 36usize);
-    assert!(offset_of!(ObjectProperty, shorthand) == 37usize);
-    assert!(offset_of!(ObjectProperty, computed) == 38usize);
+    assert!(offset_of!(ObjectProperty, method) == 28usize);
+    assert!(offset_of!(ObjectProperty, shorthand) == 29usize);
+    assert!(offset_of!(ObjectProperty, computed) == 30usize);
 
     assert!(size_of::<PropertyKey>() == 8usize);
     assert!(align_of::<PropertyKey>() == 4usize);

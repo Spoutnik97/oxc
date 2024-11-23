@@ -48,6 +48,8 @@ impl<'a> Gen for Program<'a> {
             stmt.print(p, ctx);
             p.print_semicolon_if_needed();
         }
+        // Print trailing statement comments.
+        p.print_statement_comments(self.span.end);
     }
 }
 
@@ -65,7 +67,7 @@ impl<'a> Gen for Directive<'a> {
         p.print_indent();
         // A Use Strict Directive may not contain an EscapeSequence or LineContinuation.
         // So here should print original `directive` value, the `expression` value is escaped str.
-        // See https://github.com/babel/babel/blob/main/packages/babel-generator/src/generators/base.ts#L64
+        // See https://github.com/babel/babel/blob/v7.26.2/packages/babel-generator/src/generators/base.ts#L64
         p.wrap_quote(|p, _| {
             p.print_str(self.directive.as_str());
         });
@@ -662,13 +664,28 @@ impl<'a> Gen for Function<'a> {
 
 impl<'a> Gen for FunctionBody<'a> {
     fn gen(&self, p: &mut Codegen, ctx: Context) {
-        p.print_curly_braces(self.span, self.is_empty(), |p| {
+        let span_end = self.span.end;
+        let comments_at_end = if !p.options.minify && span_end > 0 {
+            p.get_statement_comments(span_end - 1)
+        } else {
+            None
+        };
+        let is_empty = if self.is_empty() {
+            comments_at_end.is_none() || comments_at_end.as_ref().is_some_and(|c| c.0.is_empty())
+        } else {
+            false
+        };
+        p.print_curly_braces(self.span, is_empty, |p| {
             for directive in &self.directives {
                 directive.print(p, ctx);
             }
             for stmt in &self.statements {
                 p.print_semicolon_if_needed();
                 stmt.print(p, ctx);
+            }
+            // Print trailing statement comments.
+            if let Some((comments, unused)) = comments_at_end {
+                p.print_comments(span_end - 1, &comments, unused);
             }
         });
         p.needs_semicolon = false;
@@ -1146,12 +1163,14 @@ impl<'a> GenExpr for NumericLiteral<'a> {
 
 impl<'a> Gen for BigIntLiteral<'a> {
     fn gen(&self, p: &mut Codegen, _ctx: Context) {
-        if self.raw.starts_with('-') {
+        let raw = self.raw.as_str().cow_replace('_', "");
+        if raw.starts_with('-') {
             p.print_space_before_operator(Operator::Unary(UnaryOperator::UnaryNegation));
         }
+
         p.print_space_before_identifier();
         p.add_source_mapping(self.span.start);
-        p.print_str(self.raw.as_str());
+        p.print_str(&raw);
     }
 }
 
@@ -1606,7 +1625,7 @@ impl<'a> GenExpr for ArrowFunctionExpression<'a> {
             if self.expression {
                 if let Some(Statement::ExpressionStatement(stmt)) = &self.body.statements.first() {
                     p.start_of_arrow_expr = p.code_len();
-                    stmt.expression.print_expr(p, Precedence::Comma, ctx.and_forbid_in(true));
+                    stmt.expression.print_expr(p, Precedence::Comma, ctx);
                 }
             } else {
                 self.body.print(p, ctx);
@@ -1968,7 +1987,7 @@ impl<'a> GenExpr for ImportExpression<'a> {
             }
             if has_comment {
                 // Handle `/* comment */);`
-                if !p.print_expr_comments(self.span.end - 1) {
+                if self.span.end > 0 && !p.print_expr_comments(self.span.end - 1) {
                     p.print_soft_newline();
                 }
                 p.dedent();
@@ -2030,6 +2049,7 @@ impl<'a> GenExpr for ChainExpression<'a> {
     fn gen_expr(&self, p: &mut Codegen, precedence: Precedence, ctx: Context) {
         p.wrap(precedence >= Precedence::Postfix, |p| match &self.expression {
             ChainElement::CallExpression(expr) => expr.print_expr(p, precedence, ctx),
+            ChainElement::TSNonNullExpression(expr) => expr.print_expr(p, precedence, ctx),
             match_member_expression!(ChainElement) => {
                 self.expression.to_member_expression().print_expr(p, precedence, ctx);
             }
@@ -2050,13 +2070,13 @@ impl<'a> GenExpr for NewExpression<'a> {
             p.print_str("new ");
             self.callee.print_expr(p, Precedence::New, Context::FORBID_CALL);
             p.print_ascii_byte(b'(');
-            let has_comment = p.has_comment(self.span.end - 1)
+            let has_comment = (self.span.end > 0 && p.has_comment(self.span.end - 1))
                 || self.arguments.iter().any(|item| p.has_comment(item.span().start));
             if has_comment {
                 p.indent();
                 p.print_list_with_comments(&self.arguments, ctx);
                 // Handle `/* comment */);`
-                if !p.print_expr_comments(self.span.end - 1) {
+                if self.span.end > 0 && !p.print_expr_comments(self.span.end - 1) {
                     p.print_soft_newline();
                 }
                 p.dedent();
@@ -3590,17 +3610,8 @@ impl<'a> Gen for TSEnumDeclaration<'a> {
 impl<'a> Gen for TSEnumMember<'a> {
     fn gen(&self, p: &mut Codegen, ctx: Context) {
         match &self.id {
-            TSEnumMemberName::StaticIdentifier(decl) => decl.print(p, ctx),
-            TSEnumMemberName::StaticStringLiteral(decl) => decl.print(p, ctx),
-            TSEnumMemberName::StaticTemplateLiteral(decl) => decl.print(p, ctx),
-            TSEnumMemberName::StaticNumericLiteral(decl) => {
-                decl.print_expr(p, Precedence::Lowest, ctx);
-            }
-            decl @ match_expression!(TSEnumMemberName) => {
-                p.print_str("[");
-                decl.to_expression().print_expr(p, Precedence::Lowest, ctx);
-                p.print_str("]");
-            }
+            TSEnumMemberName::Identifier(decl) => decl.print(p, ctx),
+            TSEnumMemberName::String(decl) => decl.print(p, ctx),
         }
         if let Some(init) = &self.initializer {
             p.print_soft_space();

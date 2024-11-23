@@ -53,13 +53,18 @@ fn dot() {
     test("process.env.NODE_ENV", "production", config.clone());
     test("process.env", "process.env", config.clone());
     test("process.env.foo.bar", "process.env.foo.bar", config.clone());
-    test("process", "process", config);
+    test("process", "process", config.clone());
+
+    // computed member expression
+    test("process['env'].NODE_ENV", "production", config.clone());
 }
 
 #[test]
 fn dot_nested() {
     let config = ReplaceGlobalDefinesConfig::new(&[("process", "production")]).unwrap();
-    test("foo.process.NODE_ENV", "foo.process.NODE_ENV", config);
+    test("foo.process.NODE_ENV", "foo.process.NODE_ENV", config.clone());
+    // computed member expression
+    test("foo['process'].NODE_ENV", "foo['process'].NODE_ENV", config);
 }
 
 #[test]
@@ -83,4 +88,19 @@ fn dot_with_postfix_mixed() {
     test("import.meta.env", "env", config.clone());
     test("import.meta.somethingelse", "metaProperty", config.clone());
     test("import.meta", "1", config);
+}
+
+#[test]
+fn optional_chain() {
+    let config = ReplaceGlobalDefinesConfig::new(&[("a.b.c", "1")]).unwrap();
+    test("a.b.c", "1", config.clone());
+    test("a?.b.c", "1", config.clone());
+    test("a.b?.c", "1", config.clone());
+    test("a['b']['c']", "1", config.clone());
+    test("a?.['b']['c']", "1", config.clone());
+    test("a['b']?.['c']", "1", config.clone());
+
+    test_same("a[b][c]", config.clone());
+    test_same("a?.[b][c]", config.clone());
+    test_same("a[b]?.[c]", config.clone());
 }

@@ -149,7 +149,7 @@ impl<S: AsRef<str>> FromIterator<S> for LintPlugins {
     fn from_iter<T: IntoIterator<Item = S>>(iter: T) -> Self {
         iter.into_iter()
             .map(|plugin| plugin.as_ref().into())
-            .fold(LintPlugins::default(), LintPlugins::union)
+            .fold(LintPlugins::empty(), LintPlugins::union)
     }
 }
 
@@ -178,10 +178,26 @@ impl<'de> Deserialize<'de> for LintPlugins {
             where
                 A: de::SeqAccess<'de>,
             {
-                let mut plugins = LintPlugins::default();
-                while let Some(plugin) = seq.next_element::<&str>()? {
-                    plugins |= plugin.into();
+                let mut plugins = LintPlugins::empty();
+                loop {
+                    // serde_json::from_str will provide an &str, while
+                    // serde_json::from_value provides a String. The former is
+                    // used in almost all cases, but the latter is more
+                    // convenient for test cases.
+                    match seq.next_element::<String>() {
+                        Ok(Some(next)) => {
+                            plugins |= next.as_str().into();
+                        }
+                        Ok(None) => break,
+                        Err(_) => match seq.next_element::<&str>() {
+                            Ok(Some(next)) => {
+                                plugins |= next.into();
+                            }
+                            Ok(None) | Err(_) => break,
+                        },
+                    };
                 }
+
                 Ok(plugins)
             }
         }
@@ -299,7 +315,7 @@ impl LintPluginOptions {
 
 impl<S: AsRef<str>> FromIterator<(S, bool)> for LintPluginOptions {
     fn from_iter<I: IntoIterator<Item = (S, bool)>>(iter: I) -> Self {
-        let mut options = Self::default();
+        let mut options = Self::none();
         for (s, enabled) in iter {
             let flags = LintPlugins::from(s.as_ref());
             match flags {
@@ -364,11 +380,11 @@ mod test {
     fn test_collect_empty() {
         let empty: &[&str] = &[];
         let plugins: LintPluginOptions = empty.iter().copied().collect();
-        assert_eq!(plugins, LintPluginOptions::default());
+        assert_eq!(plugins, LintPluginOptions::none());
 
         let empty: Vec<(String, bool)> = vec![];
         let plugins: LintPluginOptions = empty.into_iter().collect();
-        assert_eq!(plugins, LintPluginOptions::default());
+        assert_eq!(plugins, LintPluginOptions::none());
     }
 
     #[test]
@@ -377,9 +393,9 @@ mod test {
         let plugins: LintPluginOptions = enabled.into_iter().collect();
         let expected = LintPluginOptions {
             react: true,
-            unicorn: true,
+            unicorn: false,
             typescript: true,
-            oxc: true,
+            oxc: false,
             import: false,
             jsdoc: false,
             jest: true,

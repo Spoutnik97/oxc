@@ -365,7 +365,6 @@ pub struct ObjectProperty<'a> {
     pub kind: PropertyKind,
     pub key: PropertyKey<'a>,
     pub value: Expression<'a>,
-    pub init: Option<Expression<'a>>, // for `CoverInitializedName`
     pub method: bool,
     pub shorthand: bool,
     pub computed: bool,
@@ -807,7 +806,6 @@ pub use match_assignment_target_pattern;
 #[generate_derive(CloneIn, GetSpan, GetSpanMut, ContentEq, ContentHash, ESTree)]
 pub struct ArrayAssignmentTarget<'a> {
     pub span: Span,
-    #[estree(type = "Array<AssignmentTargetMaybeDefault | AssignmentTargetRest | null>")]
     pub elements: Vec<'a, Option<AssignmentTargetMaybeDefault<'a>>>,
     #[estree(append_to = "elements")]
     pub rest: Option<AssignmentTargetRest<'a>>,
@@ -823,7 +821,6 @@ pub struct ArrayAssignmentTarget<'a> {
 #[generate_derive(CloneIn, GetSpan, GetSpanMut, ContentEq, ContentHash, ESTree)]
 pub struct ObjectAssignmentTarget<'a> {
     pub span: Span,
-    #[estree(type = "Array<AssignmentTargetProperty | AssignmentTargetRest>")]
     pub properties: Vec<'a, AssignmentTargetProperty<'a>>,
     #[estree(append_to = "properties")]
     pub rest: Option<AssignmentTargetRest<'a>>,
@@ -953,6 +950,8 @@ inherit_variants! {
 #[generate_derive(CloneIn, GetSpan, GetSpanMut, ContentEq, ContentHash, ESTree)]
 pub enum ChainElement<'a> {
     CallExpression(Box<'a, CallExpression<'a>>) = 0,
+    /// `foo?.baz!` or `foo?.[bar]!`
+    TSNonNullExpression(Box<'a, TSNonNullExpression<'a>>) = 1,
     // `MemberExpression` variants added here by `inherit_variants!` macro
     @inherit MemberExpression
 }
@@ -1482,7 +1481,6 @@ pub struct AssignmentPattern<'a> {
 #[generate_derive(CloneIn, GetSpan, GetSpanMut, ContentEq, ContentHash, ESTree)]
 pub struct ObjectPattern<'a> {
     pub span: Span,
-    #[estree(type = "Array<BindingProperty | BindingRestElement>")]
     pub properties: Vec<'a, BindingProperty<'a>>,
     #[estree(append_to = "properties")]
     pub rest: Option<Box<'a, BindingRestElement<'a>>>,
@@ -1505,7 +1503,6 @@ pub struct BindingProperty<'a> {
 #[generate_derive(CloneIn, GetSpan, GetSpanMut, ContentEq, ContentHash, ESTree)]
 pub struct ArrayPattern<'a> {
     pub span: Span,
-    #[estree(type = "Array<BindingPattern | BindingRestElement | null>")]
     pub elements: Vec<'a, Option<BindingPattern<'a>>>,
     #[estree(append_to = "elements")]
     pub rest: Option<Box<'a, BindingRestElement<'a>>>,
@@ -1933,13 +1930,14 @@ pub struct PropertyDefinition<'a> {
     /// Initialized value in the declaration.
     ///
     /// ## Example
-    /// ```
+    /// ```ts
     /// class Foo {
-    ///   x = 5     // Some(NumericLiteral)
-    ///   y: string // None
+    ///   x = 5;     // Some(NumericLiteral)
+    ///   y;         // None
+    ///   z: string; // None
     ///
     ///   constructor() {
-    ///     this.y = "hello"
+    ///     this.z = "hello";
     ///   }
     /// }
     /// ```
@@ -1947,10 +1945,10 @@ pub struct PropertyDefinition<'a> {
     /// Property was declared with a computed key
     ///
     /// ## Example
-    /// ```ts
+    /// ```js
     /// class Foo {
-    ///   ["a"]: string // true
-    ///   b: number     // false
+    ///   ["a"]: 1; // true
+    ///   b: 2;     // false
     /// }
     /// ```
     pub computed: bool,
@@ -1961,12 +1959,12 @@ pub struct PropertyDefinition<'a> {
     /// ## Example
     /// ```ts
     /// class Foo {
-    ///   x: number         // false
-    ///   declare y: string // true
+    ///   x: number;         // false
+    ///   declare y: string; // true
     /// }
     ///
     /// declare class Bar {
-    ///   x: number         // false
+    ///   x: number;         // false
     /// }
     /// ```
     #[ts]
@@ -1994,10 +1992,10 @@ pub struct PropertyDefinition<'a> {
     ///
     /// ```ts
     /// class Foo {
-    ///   public w: number     // Some(TSAccessibility::Public)
-    ///   private x: string    // Some(TSAccessibility::Private)
-    ///   protected y: boolean // Some(TSAccessibility::Protected)
-    ///   readonly z           // None
+    ///   public w: number;     // Some(TSAccessibility::Public)
+    ///   private x: string;    // Some(TSAccessibility::Private)
+    ///   protected y: boolean; // Some(TSAccessibility::Protected)
+    ///   readonly z;           // None
     /// }
     /// ```
     #[ts]
@@ -2418,7 +2416,7 @@ pub enum ExportDefaultDeclarationKind<'a> {
 /// Supports:
 ///   * `import {"\0 any unicode" as foo} from ""`
 ///   * `export {foo as "\0 any unicode"}`
-/// * es2022: <https://github.com/estree/estree/blob/master/es2022.md#modules>
+/// * es2022: <https://github.com/estree/estree/blob/e6015c4c63118634749001b1cd1c3f7a0388f16e/es2022.md#modules>
 /// * <https://github.com/tc39/ecma262/pull/2154>
 #[ast(visit)]
 #[derive(Debug, Clone)]

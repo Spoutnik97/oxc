@@ -1,14 +1,21 @@
 mod categories;
 mod env;
+mod flat;
 mod globals;
+mod overrides;
 mod oxlintrc;
 mod plugins;
 mod rules;
 mod settings;
 
+use std::path::PathBuf;
+
+pub(crate) use self::flat::ResolvedLinterState;
 pub use self::{
     env::OxlintEnv,
+    flat::ConfigStore,
     globals::OxlintGlobals,
+    overrides::OxlintOverrides,
     oxlintrc::Oxlintrc,
     plugins::LintPlugins,
     rules::ESLintRule,
@@ -16,7 +23,7 @@ pub use self::{
     settings::{jsdoc::JSDocPluginSettings, OxlintSettings},
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub(crate) struct LintConfig {
     pub(crate) plugins: LintPlugins,
     pub(crate) settings: OxlintSettings,
@@ -24,6 +31,8 @@ pub(crate) struct LintConfig {
     pub(crate) env: OxlintEnv,
     /// Enabled or disabled specific global variables.
     pub(crate) globals: OxlintGlobals,
+    /// Absolute path to the configuration file (may be `None` if there is no file).
+    pub(crate) path: Option<PathBuf>,
 }
 
 impl From<Oxlintrc> for LintConfig {
@@ -33,6 +42,7 @@ impl From<Oxlintrc> for LintConfig {
             settings: config.settings,
             env: config.env,
             globals: config.globals,
+            path: Some(config.path),
         }
     }
 }
@@ -53,6 +63,7 @@ mod test {
         let fixture_path = env::current_dir().unwrap().join("fixtures/eslint_config.json");
         let config = Oxlintrc::from_file(&fixture_path).unwrap();
         assert!(!config.rules.is_empty());
+        assert!(config.path.ends_with("fixtures/eslint_config.json"));
     }
 
     #[test]
@@ -101,7 +112,7 @@ mod test {
     fn test_vitest_rule_replace() {
         let fixture_path: std::path::PathBuf =
             env::current_dir().unwrap().join("fixtures/eslint_config_vitest_replace.json");
-        let mut config = Oxlintrc::from_file(&fixture_path).unwrap();
+        let config = Oxlintrc::from_file(&fixture_path).unwrap();
         let mut set = FxHashSet::default();
         config.rules.override_rules(&mut set, &RULES);
 

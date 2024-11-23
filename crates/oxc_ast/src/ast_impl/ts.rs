@@ -1,6 +1,6 @@
 //! TypeScript Definitions
 //!
-//! [AST Spec](https://github.com/typescript-eslint/typescript-eslint/tree/main/packages/ast-spec)
+//! [AST Spec](https://github.com/typescript-eslint/typescript-eslint/tree/v8.9.0/packages/ast-spec)
 //! [Archived TypeScript spec](https://github.com/microsoft/TypeScript/blob/3c99d50da5a579d9fa92d02664b1b66d4ff55944/doc/spec-ARCHIVED.md)
 #![warn(missing_docs)]
 
@@ -11,14 +11,11 @@ use oxc_span::Atom;
 use crate::ast::*;
 
 impl<'a> TSEnumMemberName<'a> {
-    /// Get the name of this enum member if it can be determined statically.
-    pub fn static_name(&self) -> Option<&'a str> {
+    /// Get the name of this enum member.
+    pub fn static_name(&self) -> Atom<'a> {
         match self {
-            Self::StaticIdentifier(ident) => Some(ident.name.as_str()),
-            Self::StaticStringLiteral(lit) => Some(lit.value.as_str()),
-            Self::NumericLiteral(lit) => Some(lit.raw),
-            Self::StaticTemplateLiteral(lit) => lit.quasi().map(Into::into),
-            _ => None,
+            Self::Identifier(ident) => ident.name.clone(),
+            Self::String(lit) => lit.value.clone(),
         }
     }
 }

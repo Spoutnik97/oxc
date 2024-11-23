@@ -1,12 +1,12 @@
 #![allow(clippy::print_stdout)]
-use std::{path::Path, str::FromStr};
+use std::path::Path;
 
 use oxc_allocator::Allocator;
 use oxc_codegen::CodeGenerator;
 use oxc_parser::Parser;
 use oxc_semantic::SemanticBuilder;
 use oxc_span::SourceType;
-use oxc_transformer::{ESTarget, EnvOptions, TransformOptions, Transformer};
+use oxc_transformer::{EnvOptions, HelperLoaderMode, TransformOptions, Transformer};
 use pico_args::Arguments;
 
 // Instruction:
@@ -55,18 +55,20 @@ fn main() {
 
     let (symbols, scopes) = ret.semantic.into_symbol_table_and_scope_tree();
 
-    let transform_options = if let Some(query) = &targets {
+    let mut transform_options = if let Some(query) = &targets {
         TransformOptions {
             env: EnvOptions::from_browserslist_query(query).unwrap(),
             ..TransformOptions::default()
         }
     } else if let Some(target) = &target {
-        TransformOptions::from(ESTarget::from_str(target).unwrap())
+        TransformOptions::from_target(target).unwrap()
     } else {
         TransformOptions::enable_all()
     };
 
-    let ret = Transformer::new(&allocator, path, transform_options).build_with_symbols_and_scopes(
+    transform_options.helper_loader.mode = HelperLoaderMode::External;
+
+    let ret = Transformer::new(&allocator, path, &transform_options).build_with_symbols_and_scopes(
         symbols,
         scopes,
         &mut program,

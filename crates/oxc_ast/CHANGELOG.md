@@ -4,6 +4,68 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project does not adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) until v1.0.0.
 
+## [0.37.0] - 2024-11-21
+
+- f059b0e ast: [**BREAKING**] Add missing `ChainExpression` from `TSNonNullExpression` (#7377) (Boshen)
+
+- 41a0e60 ast: [**BREAKING**] Remove `impl GetAddress for Function` (#7343) (overlookmotel)
+
+- 44375a5 ast: [**BREAKING**] Rename `TSEnumMemberName` enum variants (#7250) (overlookmotel)
+
+### Features
+
+- 39afb48 allocator: Introduce `Vec::from_array_in` (#7331) (overlookmotel)
+- 897d3b1 ast: Serialize StringLiterals to ESTree without `raw` (#7263) (ottomated)
+- 224775c transformer: Transform object rest spread (#7003) (Boshen)
+- 885e37f transformer: Optional Chaining (#6990) (Boshen)
+
+### Bug Fixes
+
+
+### Performance
+
+- c84e892 ast: `AstBuilder::vec1` use `Vec::from_array_in` (#7334) (overlookmotel)
+
+### Documentation
+
+- f0affa2 ast: Improve docs examples for `PropertyDefinition` (#7287) (overlookmotel)
+- 740ba4b ast: Correct doc comment for `StringLiteral` (#7255) (overlookmotel)
+
+### Refactor
+
+- de472ca ast: Move `StringLiteral` definition higher up (#7270) (overlookmotel)
+- d3d58f8 ast: Remove `inherit_variants!` from `TSEnumMemberName` (#7248) (overlookmotel)
+
+### Styling
+
+- 10cdce9 ast: Add line break (#7271) (overlookmotel)
+
+## [0.36.0] - 2024-11-09
+
+- b11ed2c ast: [**BREAKING**] Remove useless `ObjectProperty::init` field (#7220) (Boshen)
+
+- 0e4adc1 ast: [**BREAKING**] Remove invalid expressions from `TSEnumMemberName` (#7219) (Boshen)
+
+- 092de67 types: [**BREAKING**] Append `rest` field into `elements` for objects and arrays to align with estree (#7212) (ottomated)
+
+- d1d1874 ast: [**BREAKING**] Change `comment.span` to real position that contain `//` and `/*` (#7154) (Boshen)
+
+- 843bce4 ast: [**BREAKING**] `IdentifierReference::reference_id` return `ReferenceId` (#7126) (overlookmotel)
+
+### Features
+
+- cc8a191 ast: Methods on AST nodes to get `scope_id` etc (#7127) (overlookmotel)
+- dc0215c ast_tools: Add #[estree(append_to)], remove some custom serialization code (#7149) (ottomated)
+- 9d6cc9d estree: ESTree compatibility for all literals (#7152) (ottomated)
+
+### Bug Fixes
+
+
+### Refactor
+
+- d27e14f ast: `AstKind::as_*` methods take `self` (#5546) (overlookmotel)
+- fac5042 ast: Use `scope_id` etc methods (#7130) (overlookmotel)
+
 ## [0.35.0] - 2024-11-04
 
 - f543a8d ast: [**BREAKING**] Remove `AstBuilder::*_from_*` methods (#7073) (overlookmotel)

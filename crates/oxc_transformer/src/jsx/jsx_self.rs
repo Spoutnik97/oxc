@@ -26,7 +26,7 @@
 //!
 //! ## References:
 //!
-//! * Babel plugin implementation: <https://github.com/babel/babel/blob/main/packages/babel-plugin-transform-react-jsx-self/src/index.ts>
+//! * Babel plugin implementation: <https://github.com/babel/babel/blob/v7.26.2/packages/babel-plugin-transform-react-jsx-self/src/index.ts>
 
 use oxc_ast::ast::*;
 use oxc_diagnostics::OxcDiagnostic;
@@ -89,8 +89,7 @@ impl<'a, 'ctx> JsxSelf<'a, 'ctx> {
         let kind = PropertyKind::Init;
         let key = ctx.ast.property_key_identifier_name(SPAN, SELF);
         let value = ctx.ast.expression_this(SPAN);
-        ctx.ast
-            .object_property_kind_object_property(SPAN, kind, key, value, None, false, false, false)
+        ctx.ast.object_property_kind_object_property(SPAN, kind, key, value, false, false, false)
     }
 
     pub fn can_add_self_attribute(ctx: &TraverseCtx<'a>) -> bool {
